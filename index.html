@@ -36,40 +36,56 @@
           <span>Mật Ngữ Bảo Mật</span>
         </div>
 
+        <!-- Thông báo mật mã mặc định rõ ràng -->
+        <div class="lock-default-hint" onclick="quickUnlock()">
+          💡 Mật mã mặc định: <strong>1234</strong> <span class="tap-to-fill">(Chạm để điền & vào ngay)</span>
+        </div>
+
         <!-- Màn hình hiển thị 4 chấm PIN -->
-        <div class="pin-display" id="pinDisplay">
+        <div class="pin-display" id="pinDisplay" onclick="focusHiddenInput()">
           <span class="pin-dot" id="dot0"></span>
           <span class="pin-dot" id="dot1"></span>
           <span class="pin-dot" id="dot2"></span>
           <span class="pin-dot" id="dot3"></span>
         </div>
 
+        <!-- Input ẩn hỗ trợ bàn phím thật trên mobile & desktop -->
+        <input type="tel" id="hiddenPinInput" class="hidden-pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="handleHiddenInput(this.value)" autocomplete="off">
+
         <div id="lockErrorMsg" class="lock-error-msg"></div>
 
         <!-- Bàn phím số PIN Pad mượt mà -->
         <div class="pin-pad">
-          <button class="pin-btn" onclick="pressKey('1')">1</button>
-          <button class="pin-btn" onclick="pressKey('2')">2</button>
-          <button class="pin-btn" onclick="pressKey('3')">3</button>
-          <button class="pin-btn" onclick="pressKey('4')">4</button>
-          <button class="pin-btn" onclick="pressKey('5')">5</button>
-          <button class="pin-btn" onclick="pressKey('6')">6</button>
-          <button class="pin-btn" onclick="pressKey('7')">7</button>
-          <button class="pin-btn" onclick="pressKey('8')">8</button>
-          <button class="pin-btn" onclick="pressKey('9')">9</button>
-          <button class="pin-btn pin-btn-clear" onclick="clearPin()">Xóa</button>
-          <button class="pin-btn" onclick="pressKey('0')">0</button>
-          <button class="pin-btn pin-btn-back" onclick="backspacePin()">⌫</button>
+          <button type="button" class="pin-btn" onclick="pressKey('1')">1</button>
+          <button type="button" class="pin-btn" onclick="pressKey('2')">2</button>
+          <button type="button" class="pin-btn" onclick="pressKey('3')">3</button>
+          <button type="button" class="pin-btn" onclick="pressKey('4')">4</button>
+          <button type="button" class="pin-btn" onclick="pressKey('5')">5</button>
+          <button type="button" class="pin-btn" onclick="pressKey('6')">6</button>
+          <button type="button" class="pin-btn" onclick="pressKey('7')">7</button>
+          <button type="button" class="pin-btn" onclick="pressKey('8')">8</button>
+          <button type="button" class="pin-btn" onclick="pressKey('9')">9</button>
+          <button type="button" class="pin-btn pin-btn-clear" onclick="clearPin()">Xóa</button>
+          <button type="button" class="pin-btn" onclick="pressKey('0')">0</button>
+          <button type="button" class="pin-btn pin-btn-back" onclick="backspacePin()">⌫</button>
         </div>
 
         <div class="lock-actions">
-          <button class="btn-quick-unlock" onclick="quickUnlock()">
-            🔑 Mở Khóa Nhanh (Mật mã: 1234)
+          <button type="button" class="btn-quick-unlock" onclick="quickUnlock()">
+            ⚡ Mở Khóa Nhanh (Mật mã: 1234)
+          </button>
+          
+          <button type="button" class="btn-direct-unlock" onclick="unlockAppDirectly()">
+            🚪 Vào Chùa Ngay (Không Cần Mật Mã)
+          </button>
+
+          <button type="button" class="btn-set-custom-pin" onclick="promptCustomPinOnLock()">
+            ✏️ Đặt Mật Mã Mới Của Bạn
           </button>
           
           <label class="remember-session">
             <input type="checkbox" id="rememberSessionCheck" checked>
-            <span>Ghi nhớ phiên đăng nhập trên thiết bị này</span>
+            <span>Ghi nhớ phiên đăng nhập trên máy này</span>
           </label>
         </div>
       </div>
@@ -740,13 +756,19 @@
       <div class="modal-body">
         <!-- Đổi mật mã bảo mật -->
         <div class="setting-group">
-          <h4>🔒 Đổi Mật Mã Bảo Mật Chùa Online</h4>
-          <p class="setting-desc">Mật mã mặc định ban đầu là <strong>1234</strong>. Bạn có thể đổi sang mã PIN 4 số của riêng bạn.</p>
+          <h4>🔒 Đặt / Đổi Mật Mã Bảo Mật Chùa Online</h4>
+          <p class="setting-desc">Mật mã mở khóa hiện tại: <strong id="currentPinDisplay" style="color:#facc15;">1234</strong>. Bạn có thể đổi sang mã PIN 4 số bất kỳ:</p>
           <div class="change-pin-form">
-            <input type="password" id="inputOldPin" class="form-input" maxlength="4" placeholder="Nhập mật mã hiện tại (VD: 1234)...">
-            <input type="password" id="inputNewPin" class="form-input" maxlength="4" placeholder="Nhập mật mã mới (4 số)...">
-            <input type="password" id="inputConfirmPin" class="form-input" maxlength="4" placeholder="Xác nhận mật mã mới...">
-            <button class="btn-save-pin" onclick="saveNewPasscode()">💾 Lưu Mật Mã Mới</button>
+            <div class="pin-field-row">
+              <label>Mã PIN 4 số mới:</label>
+              <input type="tel" inputmode="numeric" pattern="[0-9]*" id="inputNewPin" class="form-input" maxlength="4" placeholder="Nhập 4 số mới (VD: 6868)..." autocomplete="off">
+            </div>
+            <div class="pin-field-row">
+              <label>Nhập lại để xác nhận:</label>
+              <input type="tel" inputmode="numeric" pattern="[0-9]*" id="inputConfirmPin" class="form-input" maxlength="4" placeholder="Nhập lại đúng 4 số trên..." autocomplete="off">
+            </div>
+            <button type="button" class="btn-save-pin" onclick="saveNewPasscode()">💾 Lưu Mật Mã Mới</button>
+            <button type="button" class="btn-reset-default-pin" onclick="resetDefaultPasscode()">🔄 Khôi Phục Về Mặc Định (1234)</button>
             <div id="pinChangeNotice" class="pin-change-notice"></div>
           </div>
         </div>

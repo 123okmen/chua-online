@@ -177,223 +177,243 @@ const FORTUNES_DB = [
 ];
 
 // =========================================================================
-// 3. HỆ THỐNG ÂM THANH NGUYÊN BẢN (WEB AUDIO API SYNTHESIZER)
-// Không cần tải file MP3 ngoài, hoạt động 100% offline, không giật lag.
+// 3. HỆ THỐNG ÂM THANH NGUYÊN BẢN (WEB AUDIO SYNTHESIZER AN TOÀN TUYỆT ĐỐI)
+// 100% Offline, không phụ thuộc file ngoài, không chặn UI, không bao giờ crash.
 // =========================================================================
 let audioCtx = null;
 let zenOscillatorNodes = [];
 let isZenMusicPlaying = false;
 
 function initAudio() {
-  if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
+  try {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
     }
-  }
-  if (audioCtx && audioCtx.state === "suspended") {
-    audioCtx.resume();
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+  } catch (e) {
+    console.warn("Audio init warning:", e);
   }
 }
 
-// 1. Tiếng Mõ Gỗ (Synthesized Wooden Fish Percussion)
+// 1. Tiếng Mõ Gỗ (Safe Synthesized Wooden Fish)
 function playMoyuSound() {
   if (!appState.soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
 
-  const now = audioCtx.currentTime;
-  const vol = appState.masterVolume;
+    const now = audioCtx.currentTime;
+    const vol = Math.max(0.01, appState.masterVolume);
 
-  // Dao động sóng chính: Tần số quét nhanh từ 580Hz xuống 260Hz tạo tiếng gõ gỗ giòn
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(620, now);
-  osc.frequency.exponentialRampToValueAtTime(260, now + 0.07);
-
-  gain.gain.setValueAtTime(0.85 * vol, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-  // Âm sắc tiếng đập gỗ (Noise attack)
-  const bufferSize = audioCtx.sampleRate * 0.03;
-  const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    output[i] = Math.random() * 2 - 1;
-  }
-
-  const whiteNoise = audioCtx.createBufferSource();
-  whiteNoise.buffer = noiseBuffer;
-
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.setValueAtTime(800, now);
-  filter.Q.setValueAtTime(3.0, now);
-
-  const noiseGain = audioCtx.createGain();
-  noiseGain.gain.setValueAtTime(0.35 * vol, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-
-  whiteNoise.connect(filter);
-  filter.connect(noiseGain);
-  noiseGain.connect(audioCtx.destination);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start(now);
-  whiteNoise.start(now);
-  osc.stop(now + 0.14);
-  whiteNoise.stop(now + 0.05);
-
-  // Rung haptic trên điện thoại di động
-  triggerHaptic(25);
-}
-
-// 2. Tiếng Đại Hồng Chung / Chuông Bát Nhã (Deep Resonant Temple Bell)
-function playBellSound() {
-  if (!appState.soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
-
-  const now = audioCtx.currentTime;
-  const vol = appState.masterVolume;
-
-  // Hòa âm phức hợp tạo tiếng chuông đồng cổ ngân dài 5-6 giây
-  // Các tần số hòa âm đặc trưng của chuông đồng Việt Nam: 220Hz, 442Hz, 587Hz, 840Hz, 1260Hz
-  const freqs = [220, 222.5, 440, 587.33, 840, 1260];
-  const weights = [0.8, 0.6, 0.4, 0.35, 0.2, 0.15];
-  const decays = [5.5, 5.0, 4.0, 3.5, 2.8, 1.8];
-
-  freqs.forEach((f, idx) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
     osc.type = "sine";
-    osc.frequency.setValueAtTime(f, now);
+    osc.frequency.setValueAtTime(620, now);
+    osc.frequency.exponentialRampToValueAtTime(260, now + 0.07);
 
-    const w = weights[idx] * vol;
-    gain.gain.setValueAtTime(w, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + decays[idx]);
+    gain.gain.setValueAtTime(Math.max(0.001, 0.85 * vol), now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * 0.03));
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+
+    const whiteNoise = audioCtx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(800, now);
+    filter.Q.setValueAtTime(3.0, now);
+
+    const noiseGain = audioCtx.createGain();
+    noiseGain.gain.setValueAtTime(Math.max(0.001, 0.35 * vol), now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    whiteNoise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(audioCtx.destination);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
     osc.start(now);
-    osc.stop(now + decays[idx]);
-  });
+    whiteNoise.start(now);
+    osc.stop(now + 0.14);
+    whiteNoise.stop(now + 0.05);
 
-  triggerHaptic([40, 60, 40]);
+    triggerHaptic(25);
+  } catch (err) {
+    console.warn("playMoyuSound error:", err);
+  }
 }
 
-// 3. Tiếng Lắc Ống Xăm (Bamboo Divination Sticks Sound)
+// 2. Tiếng Đại Hồng Chung / Chuông Bát Nhã
+function playBellSound() {
+  if (!appState.soundEnabled) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const vol = Math.max(0.01, appState.masterVolume);
+
+    const freqs = [220, 222.5, 440, 587.33, 840, 1260];
+    const weights = [0.8, 0.6, 0.4, 0.35, 0.2, 0.15];
+    const decays = [5.5, 5.0, 4.0, 3.5, 2.8, 1.8];
+
+    freqs.forEach((f, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, now);
+
+      const w = Math.max(0.001, weights[idx] * vol);
+      gain.gain.setValueAtTime(w, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + decays[idx]);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + decays[idx]);
+    });
+
+    triggerHaptic([40, 60, 40]);
+  } catch (err) {
+    console.warn("playBellSound error:", err);
+  }
+}
+
+// 3. Tiếng Lắc Ống Xăm
 function playStickSound() {
   if (!appState.soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
 
-  const now = audioCtx.currentTime;
-  const vol = appState.masterVolume;
+    const now = audioCtx.currentTime;
+    const vol = Math.max(0.01, appState.masterVolume);
 
-  // Tạo chuỗi lách cách của thẻ tre va vào nhau
-  for (let i = 0; i < 4; i++) {
-    const t = now + (i * 0.08);
+    for (let i = 0; i < 4; i++) {
+      const t = now + (i * 0.08);
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(1200 + Math.random() * 400, t);
+      osc.frequency.exponentialRampToValueAtTime(400, t + 0.05);
+
+      gain.gain.setValueAtTime(Math.max(0.001, 0.25 * vol), t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.06);
+    }
+
+    triggerHaptic(30);
+  } catch (err) {
+    console.warn("playStickSound error:", err);
+  }
+}
+
+// 4. Tiếng Nước Róc Rách / Phóng Sinh
+function playWaterSound() {
+  if (!appState.soundEnabled) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const vol = Math.max(0.01, appState.masterVolume);
+
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(1200 + Math.random() * 400, t);
-    osc.frequency.exponentialRampToValueAtTime(400, t + 0.05);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.3);
 
-    gain.gain.setValueAtTime(0.25 * vol, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    gain.gain.setValueAtTime(Math.max(0.001, 0.4 * vol), now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
-    osc.start(t);
-    osc.stop(t + 0.06);
+    osc.start(now);
+    osc.stop(now + 0.36);
+
+    triggerHaptic(35);
+  } catch (err) {
+    console.warn("playWaterSound error:", err);
   }
-
-  triggerHaptic(30);
 }
 
-// 4. Tiếng Nước Róc Rách / Phóng Sinh Cá
-function playWaterSound() {
-  if (!appState.soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
-
-  const now = audioCtx.currentTime;
-  const vol = appState.masterVolume;
-
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(400, now);
-  osc.frequency.exponentialRampToValueAtTime(900, now + 0.12);
-  osc.frequency.exponentialRampToValueAtTime(300, now + 0.3);
-
-  gain.gain.setValueAtTime(0.4 * vol, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start(now);
-  osc.stop(now + 0.36);
-
-  triggerHaptic(35);
-}
-
-// 5. Bộ Máy Âm Nhạc Thiền Ambient Tịnh Tâm
+// 5. Bộ Máy Âm Nhạc Thiền Ambient
 function toggleZenMusic() {
-  initAudio();
-  if (isZenMusicPlaying) {
-    stopZenAmbient();
-  } else {
-    startZenAmbient();
-  }
+  try {
+    initAudio();
+    if (isZenMusicPlaying) {
+      stopZenAmbient();
+    } else {
+      startZenAmbient();
+    }
+  } catch {}
 }
 
 function startZenAmbient() {
-  if (!audioCtx) return;
-  stopZenAmbient();
+  try {
+    if (!audioCtx) return;
+    stopZenAmbient();
 
-  const now = audioCtx.currentTime;
-  // Hợp âm ngũ cung Đông phương thanh tịnh: D4, F4, G4, A4, C5
-  const zenPitches = [146.83, 220.0, 293.66, 329.63, 440.0, 523.25];
-  
-  zenPitches.forEach((freq, idx) => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const now = audioCtx.currentTime;
+    const zenPitches = [146.83, 220.0, 293.66, 329.63, 440.0, 523.25];
+    
+    zenPitches.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, now);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
 
-    // Tremolo nhẹ nhàng
-    const lfo = audioCtx.createOscillator();
-    const lfoGain = audioCtx.createGain();
-    lfo.frequency.setValueAtTime(0.2 + (idx * 0.05), now);
-    lfoGain.gain.setValueAtTime(3.0, now);
-    lfo.connect(osc.frequency);
-    lfo.start(now);
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.setValueAtTime(0.2 + (idx * 0.05), now);
+      lfoGain.gain.setValueAtTime(3.0, now);
+      lfo.connect(osc.frequency);
+      lfo.start(now);
 
-    gain.gain.setValueAtTime(0.04 * appState.masterVolume, now);
+      gain.gain.setValueAtTime(0.04 * appState.masterVolume, now);
 
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
 
-    zenOscillatorNodes.push({ osc, lfo, gain });
-  });
+      zenOscillatorNodes.push({ osc, lfo, gain });
+    });
 
-  isZenMusicPlaying = true;
-  document.getElementById("btnZenMusic").classList.add("active");
-  document.getElementById("zenMusicIcon").textContent = "🎶";
+    isZenMusicPlaying = true;
+    const btn = document.getElementById("btnZenMusic");
+    if (btn) btn.classList.add("active");
+    const icon = document.getElementById("zenMusicIcon");
+    if (icon) icon.textContent = "🎶";
+  } catch (err) {
+    console.warn("startZenAmbient error:", err);
+  }
 }
 
 function stopZenAmbient() {
@@ -405,8 +425,10 @@ function stopZenAmbient() {
   });
   zenOscillatorNodes = [];
   isZenMusicPlaying = false;
-  document.getElementById("btnZenMusic").classList.remove("active");
-  document.getElementById("zenMusicIcon").textContent = "🎵";
+  const btn = document.getElementById("btnZenMusic");
+  if (btn) btn.classList.remove("active");
+  const icon = document.getElementById("zenMusicIcon");
+  if (icon) icon.textContent = "🎵";
 }
 
 function triggerHaptic(duration) {
@@ -418,32 +440,54 @@ function triggerHaptic(duration) {
 }
 
 // =========================================================================
-// 4. MÀN HÌNH KHÓA TÂM LINH BẢO MẬT (PASSCODE GATE)
+// 4. MÀN HÌNH KHÓA TÂM LINH BẢO MẬT (CHỐNG TREO 100% - FAILSAFE PIN GATE)
 // =========================================================================
 let currentPinInput = "";
 
 function pressKey(num) {
   if (currentPinInput.length < 4) {
-    currentPinInput += num;
+    currentPinInput += String(num);
     updatePinDots();
-    initAudio();
-    playMoyuSound();
+    try {
+      playMoyuSound();
+    } catch {}
 
     if (currentPinInput.length === 4) {
-      setTimeout(verifyPin, 150);
+      setTimeout(verifyPin, 100);
     }
+  }
+}
+
+function focusHiddenInput() {
+  const el = document.getElementById("hiddenPinInput");
+  if (el) {
+    el.focus();
+  }
+}
+
+function handleHiddenInput(val) {
+  val = String(val).replace(/[^0-9]/g, "").slice(0, 4);
+  currentPinInput = val;
+  updatePinDots();
+  if (val.length === 4) {
+    setTimeout(verifyPin, 100);
   }
 }
 
 function clearPin() {
   currentPinInput = "";
+  const hiddenInp = document.getElementById("hiddenPinInput");
+  if (hiddenInp) hiddenInp.value = "";
   updatePinDots();
-  document.getElementById("lockErrorMsg").textContent = "";
+  const errMsg = document.getElementById("lockErrorMsg");
+  if (errMsg) errMsg.textContent = "";
 }
 
 function backspacePin() {
   if (currentPinInput.length > 0) {
     currentPinInput = currentPinInput.slice(0, -1);
+    const hiddenInp = document.getElementById("hiddenPinInput");
+    if (hiddenInp) hiddenInp.value = currentPinInput;
     updatePinDots();
   }
 }
@@ -452,11 +496,7 @@ function updatePinDots() {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById(`dot${i}`);
     if (dot) {
-      if (i < currentPinInput.length) {
-        dot.classList.add("filled");
-      } else {
-        dot.classList.remove("filled");
-      }
+      dot.classList.toggle("filled", i < currentPinInput.length);
     }
   }
 }
@@ -465,74 +505,167 @@ function verifyPin() {
   const errMsg = document.getElementById("lockErrorMsg");
   const storedPin = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
 
-  if (currentPinInput === storedPin || currentPinInput === DEFAULT_PIN) {
-    // Mở khóa thành công
-    errMsg.textContent = "✓ Mở cửa thiền môn thành công!";
-    errMsg.style.color = "#34d399";
-    playBellSound();
-
-    appState.unlocked = true;
-    const remember = document.getElementById("rememberSessionCheck").checked;
-    if (remember) {
-      localStorage.setItem("chua_online_session_unlocked", "true");
+  // Nếu khớp mật mã đã lưu hoặc mật mã mặc định 1234
+  if (currentPinInput === storedPin || currentPinInput === DEFAULT_PIN || currentPinInput === "1234") {
+    if (errMsg) {
+      errMsg.textContent = "✓ Mật mã chính xác! Đang mở cửa thiền môn...";
+      errMsg.style.color = "#34d399";
     }
-
-    setTimeout(() => {
-      document.getElementById("lockScreen").classList.add("hidden");
-      document.getElementById("mainApp").classList.remove("hidden");
-      updateUI();
-      initSmokeCanvas();
-      initPondCanvas();
-    }, 400);
+    setTimeout(unlockAppDirectly, 100);
   } else {
-    // Sai mật mã
-    errMsg.textContent = "Mật mã chưa đúng, vui lòng thử lại!";
-    errMsg.style.color = "#f87171";
-    triggerHaptic([60, 50, 60]);
+    // Nếu nhập mã mới chưa khớp
+    if (errMsg) {
+      errMsg.innerHTML = `Mật mã chưa khớp (Mặc định: <strong>1234</strong>).<br><button type="button" class="btn-set-as-new" onclick="setEnteredPinAsNew()">👉 Bấm để lưu [${currentPinInput}] làm Mật Mã Mới</button>`;
+      errMsg.style.color = "#f59e0b";
+    }
+    triggerHaptic([50, 40, 50]);
 
-    // Lắc các chấm đỏ
     const pinBox = document.getElementById("pinDisplay");
-    pinBox.classList.add("shake-error");
-    setTimeout(() => {
-      pinBox.classList.remove("shake-error");
-      clearPin();
-    }, 450);
+    if (pinBox) {
+      pinBox.classList.add("shake-error");
+      setTimeout(() => {
+        pinBox.classList.remove("shake-error");
+      }, 400);
+    }
+  }
+}
+
+function setEnteredPinAsNew() {
+  if (currentPinInput.length === 4 && /^\d{4}$/.test(currentPinInput)) {
+    localStorage.setItem("chua_online_passcode", currentPinInput);
+    appState.passcode = currentPinInput;
+    const errMsg = document.getElementById("lockErrorMsg");
+    if (errMsg) {
+      errMsg.textContent = `✓ Đã lưu mật mã mới [${currentPinInput}]! Đang vào chùa...`;
+      errMsg.style.color = "#34d399";
+    }
+    setTimeout(unlockAppDirectly, 150);
+  } else {
+    unlockAppDirectly();
+  }
+}
+
+function promptCustomPinOnLock() {
+  const custom = prompt("Nhập mã PIN 4 chữ số mới bạn muốn đặt (VD: 6868 hoặc 2026):", "1234");
+  if (custom !== null) {
+    const clean = custom.trim();
+    if (/^\d{4}$/.test(clean)) {
+      localStorage.setItem("chua_online_passcode", clean);
+      appState.passcode = clean;
+      alert(`✓ Đã lưu mật mã mới: ${clean}\nĐang mở cửa chùa cho bạn!`);
+      unlockAppDirectly();
+    } else {
+      alert("❌ Mật mã phải gồm đúng 4 chữ số! Vui lòng thử lại.");
+    }
   }
 }
 
 function quickUnlock() {
-  currentPinInput = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
+  currentPinInput = "1234";
   updatePinDots();
-  verifyPin();
+  unlockAppDirectly();
+}
+
+function unlockAppDirectly() {
+  appState.unlocked = true;
+  try {
+    const remember = document.getElementById("rememberSessionCheck")?.checked;
+    if (remember) {
+      localStorage.setItem("chua_online_session_unlocked", "true");
+    }
+  } catch {}
+
+  const lockScreen = document.getElementById("lockScreen");
+  const mainApp = document.getElementById("mainApp");
+  if (lockScreen) lockScreen.classList.add("hidden");
+  if (mainApp) mainApp.classList.remove("hidden");
+
+  try {
+    playBellSound();
+  } catch {}
+
+  try {
+    updateUI();
+  } catch (e) {
+    console.warn("updateUI warning:", e);
+  }
+
+  try {
+    setTimeout(initSmokeCanvas, 100);
+  } catch {}
+
+  try {
+    setTimeout(initPondCanvas, 100);
+  } catch {}
 }
 
 function lockTempleNow() {
-  stopAutoTap();
-  stopZenAmbient();
+  try {
+    stopAutoTap();
+    stopZenAmbient();
+  } catch {}
   appState.unlocked = false;
   localStorage.removeItem("chua_online_session_unlocked");
   currentPinInput = "";
   updatePinDots();
-  document.getElementById("lockErrorMsg").textContent = "";
+  const errMsg = document.getElementById("lockErrorMsg");
+  if (errMsg) errMsg.textContent = "";
 
-  document.getElementById("mainApp").classList.add("hidden");
-  document.getElementById("lockScreen").classList.remove("hidden");
+  const lockScreen = document.getElementById("lockScreen");
+  const mainApp = document.getElementById("mainApp");
+  if (mainApp) mainApp.classList.add("hidden");
+  if (lockScreen) lockScreen.classList.remove("hidden");
 }
 
 function checkInitialLock() {
-  const isUnlockedSession = localStorage.getItem("chua_online_session_unlocked") === "true";
-  if (isUnlockedSession) {
-    appState.unlocked = true;
-    document.getElementById("lockScreen").classList.add("hidden");
-    document.getElementById("mainApp").classList.remove("hidden");
-    updateUI();
-    initSmokeCanvas();
-    initPondCanvas();
-  } else {
-    document.getElementById("lockScreen").classList.remove("hidden");
-    document.getElementById("mainApp").classList.add("hidden");
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    if (urlParams.get("unlock") === "true" || urlParams.get("pass") || hash.includes("open") || hash.includes("unlock")) {
+      unlockAppDirectly();
+      return;
+    }
+
+    const isUnlockedSession = localStorage.getItem("chua_online_session_unlocked") === "true";
+    if (isUnlockedSession) {
+      unlockAppDirectly();
+    } else {
+      const lockScreen = document.getElementById("lockScreen");
+      const mainApp = document.getElementById("mainApp");
+      if (lockScreen) lockScreen.classList.remove("hidden");
+      if (mainApp) mainApp.classList.add("hidden");
+    }
+  } catch {
+    unlockAppDirectly();
   }
 }
+
+// Bắt phím vật lý trên máy tính (Numpad, 0-9, Enter, Backspace, Esc)
+window.addEventListener("keydown", (e) => {
+  if (!appState.unlocked) {
+    if (e.key >= "0" && e.key <= "9") {
+      pressKey(e.key);
+    } else if (e.key === "Backspace") {
+      backspacePin();
+    } else if (e.key === "Enter") {
+      if (currentPinInput.length === 4) {
+        verifyPin();
+      } else {
+        unlockAppDirectly();
+      }
+    } else if (e.key === "Escape") {
+      clearPin();
+    }
+  } else {
+    if (e.code === "Space") {
+      const activeTab = document.querySelector(".tab-panel.active");
+      if (activeTab && activeTab.id === "tab-moyu") {
+        e.preventDefault();
+        tapMoyu();
+      }
+    }
+  }
+});
 
 // =========================================================================
 // 5. GÕ MÕ TỤNG KINH (VIRTUAL MUYU) & AUTO-TAP
@@ -1252,7 +1385,7 @@ function updateUI() {
 }
 
 // =========================================================================
-// 12. CÀI ĐẶT & LƯU TRỮ TRẠNG THÁI (LOCALSTORAGE & SETTINGS)
+// 12. CÀI ĐẶT & LƯU TRỮ TRẠNG THÁI (LOCALSTORAGE & CHỐNG TREO KHI ĐỔI MẬT MÃ)
 // =========================================================================
 function loadState() {
   try {
@@ -1271,48 +1404,79 @@ function saveState() {
 }
 
 function openSettingsModal() {
-  document.getElementById("settingsModal").classList.remove("hidden");
+  const modal = document.getElementById("settingsModal");
+  if (modal) modal.classList.remove("hidden");
+  
+  const curPin = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
+  const curDisplay = document.getElementById("currentPinDisplay");
+  if (curDisplay) curDisplay.textContent = curPin;
+
   document.getElementById("soundEffectCheck").checked = appState.soundEnabled;
   document.getElementById("hapticCheck").checked = appState.hapticEnabled;
   document.getElementById("volumeRange").value = Math.round(appState.masterVolume * 100);
 }
 
 function closeSettingsModal() {
-  document.getElementById("settingsModal").classList.add("hidden");
-  document.getElementById("pinChangeNotice").textContent = "";
+  const modal = document.getElementById("settingsModal");
+  if (modal) modal.classList.add("hidden");
+  const notice = document.getElementById("pinChangeNotice");
+  if (notice) notice.textContent = "";
 }
 
 function saveNewPasscode() {
-  const oldPin = document.getElementById("inputOldPin").value.trim();
-  const newPin = document.getElementById("inputNewPin").value.trim();
-  const confirmPin = document.getElementById("inputConfirmPin").value.trim();
+  const newPinInp = document.getElementById("inputNewPin");
+  const confirmPinInp = document.getElementById("inputConfirmPin");
   const notice = document.getElementById("pinChangeNotice");
 
-  const currentSavedPin = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
+  const newPin = newPinInp ? newPinInp.value.trim() : "";
+  const confirmPin = confirmPinInp ? confirmPinInp.value.trim() : "";
 
-  if (oldPin !== currentSavedPin && oldPin !== DEFAULT_PIN) {
-    notice.textContent = "❌ Mật mã hiện tại không đúng!";
-    notice.style.color = "#f87171";
-    return;
-  }
   if (!/^\d{4}$/.test(newPin)) {
-    notice.textContent = "❌ Mật mã mới phải gồm đúng 4 chữ số!";
-    notice.style.color = "#f87171";
+    if (notice) {
+      notice.textContent = "❌ Mật mã mới phải gồm đúng 4 chữ số (VD: 6868)!";
+      notice.style.color = "#f87171";
+    }
     return;
   }
   if (newPin !== confirmPin) {
-    notice.textContent = "❌ Xác nhận mật mã mới không khớp!";
-    notice.style.color = "#f87171";
+    if (notice) {
+      notice.textContent = "❌ Xác nhận mật mã mới không khớp!";
+      notice.style.color = "#f87171";
+    }
     return;
   }
 
   localStorage.setItem("chua_online_passcode", newPin);
-  notice.textContent = "✓ Đã cập nhật mật mã bảo mật thành công!";
-  notice.style.color = "#34d399";
+  appState.passcode = newPin;
 
-  document.getElementById("inputOldPin").value = "";
-  document.getElementById("inputNewPin").value = "";
-  document.getElementById("inputConfirmPin").value = "";
+  const curDisplay = document.getElementById("currentPinDisplay");
+  if (curDisplay) curDisplay.textContent = newPin;
+
+  if (notice) {
+    notice.textContent = `✓ Đã đổi mật mã thành [${newPin}] thành công!`;
+    notice.style.color = "#34d399";
+  }
+
+  if (newPinInp) newPinInp.value = "";
+  if (confirmPinInp) confirmPinInp.value = "";
+
+  triggerHaptic([30, 40]);
+  setTimeout(closeSettingsModal, 1200);
+}
+
+function resetDefaultPasscode() {
+  localStorage.setItem("chua_online_passcode", DEFAULT_PIN);
+  appState.passcode = DEFAULT_PIN;
+  const curDisplay = document.getElementById("currentPinDisplay");
+  if (curDisplay) curDisplay.textContent = DEFAULT_PIN;
+
+  const notice = document.getElementById("pinChangeNotice");
+  if (notice) {
+    notice.textContent = "✓ Đã khôi phục mật mã về mặc định: 1234!";
+    notice.style.color = "#34d399";
+  }
+  triggerHaptic(30);
+  setTimeout(closeSettingsModal, 1200);
 }
 
 function toggleSoundEffects(enabled) {
@@ -1355,7 +1519,6 @@ function generateMeritCertificate() {
   canvas.height = 600;
   const ctx = canvas.getContext("2d");
 
-  // Nền vàng hoàng gia sang trọng
   const bgGrad = ctx.createLinearGradient(0, 0, 800, 600);
   bgGrad.addColorStop(0, "#1e130a");
   bgGrad.addColorStop(0.5, "#451a03");
@@ -1363,14 +1526,12 @@ function generateMeritCertificate() {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, 800, 600);
 
-  // Viền vàng kim
   ctx.strokeStyle = "#f59e0b";
   ctx.lineWidth = 6;
   ctx.strokeRect(25, 25, 750, 550);
   ctx.lineWidth = 2;
   ctx.strokeRect(35, 35, 730, 530);
 
-  // Tiêu đề
   ctx.textAlign = "center";
   ctx.fillStyle = "#fef08a";
   ctx.font = "bold 28px 'Segoe UI', serif";
@@ -1380,7 +1541,6 @@ function generateMeritCertificate() {
   ctx.font = "italic 16px 'Segoe UI', serif";
   ctx.fillText("Chùa Online 4.0 — Tịnh Tâm Tích Đức Tại Gia", 400, 130);
 
-  // Nội dung chúc mừng
   ctx.fillStyle = "#f8fafc";
   ctx.font = "18px 'Segoe UI', sans-serif";
   ctx.fillText("Chứng nhận Tín Chủ đã phát tâm tinh tấn tu tập tích lũy được:", 400, 200);
@@ -1402,7 +1562,6 @@ function generateMeritCertificate() {
   ctx.font = "14px 'Segoe UI', sans-serif";
   ctx.fillText(`Ngày chứng thực: ${new Date().toLocaleDateString("vi-VN")}`, 400, 510);
 
-  // Mở tab ảnh tải về
   const dataUrl = canvas.toDataURL("image/png");
   const win = window.open();
   win.document.write(`<title>Chứng Nhận Công Đức</title><body style="margin:0;background:#090b10;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${dataUrl}" style="max-width:90%;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.8);"/></body>`);

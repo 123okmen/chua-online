@@ -44,7 +44,11 @@
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
+}
+
+input, textarea, select {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 
 body {
@@ -2115,4 +2119,127 @@ body {
   .form-row-2 {
     grid-template-columns: 1fr;
   }
+}
+
+/* Lock screen hint and extra buttons */
+.lock-default-hint {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px dashed var(--gold-500);
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--gold-300);
+  margin-bottom: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lock-default-hint:hover {
+  background: rgba(245, 158, 11, 0.28);
+}
+
+.lock-default-hint .tap-to-fill {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.hidden-pin-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.btn-direct-unlock {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #059669, #047857);
+  border: 1px solid #10b981;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-direct-unlock:hover {
+  filter: brightness(1.15);
+}
+
+.btn-set-custom-pin {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-set-custom-pin:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.btn-set-as-new {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  background: var(--gold-500);
+  border: none;
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Modal Improvements */
+.modal-overlay {
+  overflow-y: auto;
+}
+
+.modal-dialog {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;
+}
+
+.pin-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.pin-field-row label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.btn-reset-default-pin {
+  padding: 0.55rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-reset-default-pin:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
 }
