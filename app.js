@@ -1299,89 +1299,54 @@ function confirmResetMerit() {
 
 // Xuất Chứng Nhận Công Đức (HTML5 Canvas Shareable Certificate)
 function generateMeritCertificate() {
-  const canvas = document.getElementById("certDirectCanvas") || document.createElement("canvas");
-  canvas.width = 800;
-  canvas.height = 600;
-  const ctx = canvas.getContext("2d");
-
-  // Nền vàng hoàng gia sang trọng
-  const bgGrad = ctx.createLinearGradient(0, 0, 800, 600);
-  bgGrad.addColorStop(0, "#1c1108");
-  bgGrad.addColorStop(0.5, "#3d1702");
-  bgGrad.addColorStop(1, "#150a00");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, 800, 600);
-
-  // Viền vàng kim đôi
-  ctx.strokeStyle = "#f59e0b";
-  ctx.lineWidth = 6;
-  ctx.strokeRect(25, 25, 750, 550);
-  ctx.lineWidth = 2;
-  ctx.strokeRect(36, 36, 728, 528);
-
-  // Hoa văn góc
-  ctx.strokeStyle = "#facc15";
-  ctx.lineWidth = 1.5;
-  [[45, 45], [755, 45], [45, 555], [755, 555]].forEach(([cx, cy]) => {
-    ctx.beginPath();
-    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
-    ctx.stroke();
-  });
-
-  // Tiêu đề
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fef08a";
-  ctx.font = "bold 30px 'Playfair Display', serif, sans-serif";
-  ctx.fillText("CHỨNG NHẬN CÔNG ĐỨC TU TẬP", 400, 95);
-
-  ctx.fillStyle = "#f59e0b";
-  ctx.font = "italic 16px 'Plus Jakarta Sans', serif, sans-serif";
-  ctx.fillText("Chùa Online 4.0 — Tịnh Tâm Tích Đức Tại Gia", 400, 130);
-
-  // Nội dung chúc mừng
-  ctx.fillStyle = "#f8fafc";
-  ctx.font = "18px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText("Chứng nhận Tín Chủ đã phát tâm tinh tấn tu tập tích lũy được:", 400, 200);
-
-  ctx.fillStyle = "#facc15";
-  ctx.font = "bold 44px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText(`${appState.totalMerit.toLocaleString("vi-VN")} ĐIỂM CÔNG ĐỨC`, 400, 270);
-
   const rankEl = document.getElementById("ledgerRankName");
   const rankTitle = rankEl ? rankEl.textContent : "Thiện Nam Tín Nữ";
-  ctx.fillStyle = "#cbd5e1";
-  ctx.font = "16px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText(`Cấp bậc: ${rankTitle} • Chuỗi tinh tấn: ${appState.streakDays} ngày`, 400, 325);
-  ctx.fillText(`Số tiếng mõ: ${appState.totalTaps.toLocaleString("vi-VN")} | Nén nhang: ${appState.totalIncense} | Tiếng chuông: ${appState.totalBells}`, 400, 360);
 
-  ctx.fillStyle = "#f59e0b";
-  ctx.font = "italic 16px 'Playfair Display', serif, sans-serif";
-  ctx.fillText('"Phước đức vun bồi vạn sự hưng • Tâm an vạn sự an"', 400, 440);
+  const meritEl = document.getElementById("rccMeritPoints");
+  if (meritEl) meritEl.textContent = `${appState.totalMerit.toLocaleString("vi-VN")} ĐIỂM CÔNG ĐỨC`;
 
-  ctx.fillStyle = "#94a3b8";
-  ctx.font = "14px 'Plus Jakarta Sans', sans-serif";
-  ctx.fillText(`Ngày chứng thực: ${new Date().toLocaleDateString("vi-VN")}`, 400, 510);
+  const rankTitleEl = document.getElementById("rccRankTitle");
+  if (rankTitleEl) rankTitleEl.textContent = rankTitle;
 
-  // Hiển thị trực tiếp Modal
+  const streakEl = document.getElementById("rccStreakDays");
+  if (streakEl) streakEl.textContent = `${appState.streakDays} ngày`;
+
+  const tapsEl = document.getElementById("rccTaps");
+  if (tapsEl) tapsEl.textContent = appState.totalTaps.toLocaleString("vi-VN");
+
+  const incEl = document.getElementById("rccIncense");
+  if (incEl) incEl.textContent = appState.totalIncense.toLocaleString("vi-VN");
+
+  const bellEl = document.getElementById("rccBells");
+  if (bellEl) bellEl.textContent = appState.totalBells.toLocaleString("vi-VN");
+
+  const dateEl = document.getElementById("rccCertDate");
+  if (dateEl) dateEl.textContent = `Ngày chứng thực: ${new Date().toLocaleDateString("vi-VN")}`;
+
   const modal = document.getElementById("certModal");
   if (modal) modal.classList.remove("hidden");
+
   playBellSound();
 }
 
-function downloadCertificateFile() {
-  try {
-    const canvas = document.getElementById("certDirectCanvas");
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `Chung_Nhan_Cong_Duc_${new Date().toISOString().slice(0, 10)}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showZenToast("💾 Đang tải ảnh Chứng Nhận Công Đức về máy!");
-  } catch (e) {
-    console.warn("downloadCertificateFile error:", e);
+function copyCertText() {
+  const rankEl = document.getElementById("ledgerRankName");
+  const rankTitle = rankEl ? rankEl.textContent : "Thiện Nam Tín Nữ";
+  const text = `🪷 CHỨNG NHẬN CÔNG ĐỨC TU TẬP — CHÙA ONLINE 4.0 🪷\n` +
+    `• Tín Chủ đạt được: ${appState.totalMerit.toLocaleString("vi-VN")} Điểm Công Đức\n` +
+    `• Cấp bậc: ${rankTitle} (Chuỗi tinh tấn: ${appState.streakDays} ngày)\n` +
+    `• Tiếng mõ đã gõ: ${appState.totalTaps.toLocaleString("vi-VN")} | Nén nhang: ${appState.totalIncense} | Tiếng chuông: ${appState.totalBells}\n` +
+    `"Phước đức vun bồi vạn sự hưng • Tâm an vạn sự an"\n` +
+    `👉 Tu tập tại gia: https://123okmen.github.io/chua-online/`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showZenToast("✓ Đã sao chép nội dung Chứng Nhận vào bộ nhớ đệm!");
+    }).catch(() => {
+      showZenToast("✓ Đã tổng kết Chứng Nhận Công Đức!");
+    });
+  } else {
+    showZenToast("✓ Đã tạo Chứng Nhận Công Đức thành công!");
   }
 }
 

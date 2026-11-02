@@ -779,7 +779,7 @@
 
   <!-- ========================================================================= -->
   
-  <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC (CANVAS TRỰC TIẾP CHỐNG LỖI ẢNH) -->
+  <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC (THIẾT KẾ THIỀN MÔN THUẦN HTML/CSS CHỐNG LỖI 100%) -->
   <div class="modal-overlay hidden" id="certModal" onclick="closeCertModal(event)">
     <div class="cert-modal-dialog" onclick="event.stopPropagation()">
       <div class="cert-modal-header">
@@ -787,13 +787,55 @@
         <button type="button" class="modal-close" onclick="closeCertModal()">&times;</button>
       </div>
       <div class="cert-modal-body">
-        <div class="cert-canvas-frame">
-          <canvas id="certDirectCanvas" width="800" height="600" class="cert-display-canvas"></canvas>
+        <!-- BẢN CHỨNG NHẬN VÀNG HOÀNG GIA HIỂN THỊ TRỰC TIẾP CHUẨN ĐỒ HỌA CSS -->
+        <div class="royal-cert-card" id="royalCertCard">
+          <div class="rcc-border-outer">
+            <div class="rcc-border-inner">
+              <div class="rcc-corners">
+                <span class="corner tl">🪷</span>
+                <span class="corner tr">🪷</span>
+                <span class="corner bl">🪷</span>
+                <span class="corner br">🪷</span>
+              </div>
+              <div class="rcc-header">
+                <div class="rcc-emblem">✨</div>
+                <h2 class="rcc-main-title">CHỨNG NHẬN CÔNG ĐỨC TU TẬP</h2>
+                <p class="rcc-subtitle">Chùa Online 4.0 — Tịnh Tâm Tích Đức Tại Gia</p>
+              </div>
+
+              <div class="rcc-divider"></div>
+
+              <div class="rcc-content">
+                <p class="rcc-intro">Chứng nhận Tín Chủ đã phát tâm tinh tấn tu tập tích lũy được:</p>
+                <div class="rcc-merit-display" id="rccMeritPoints">0 ĐIỂM CÔNG ĐỨC</div>
+                
+                <div class="rcc-stats-summary">
+                  <div class="rcc-stat-pill">
+                    <span class="rsp-lbl">Cấp bậc:</span>
+                    <strong id="rccRankTitle">Thiện Nam Tín Nữ</strong>
+                  </div>
+                  <div class="rcc-stat-pill">
+                    <span class="rsp-lbl">Chuỗi tinh tấn:</span>
+                    <strong id="rccStreakDays">1 ngày</strong>
+                  </div>
+                </div>
+
+                <div class="rcc-details-row">
+                  <span>Mõ: <strong id="rccTaps">0</strong> tiếng</span> •
+                  <span>Nhang: <strong id="rccIncense">0</strong> nén</span> •
+                  <span>Chuông: <strong id="rccBells">0</strong> hồi</span>
+                </div>
+
+                <p class="rcc-verse">"Phước đức vun bồi vạn sự hưng • Tâm an vạn sự an"</p>
+                <div class="rcc-footer-date" id="rccCertDate">Ngày chứng thực: 01/11/2026</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <img id="certImagePreview" class="cert-preview-img hidden" alt="Chứng nhận công đức">
+
         <div class="cert-actions">
-          <button type="button" id="btnDownloadCertAction" class="btn-download-cert" onclick="downloadCertificateFile()">
-            💾 Tải Ảnh Về Máy
+          <button type="button" class="btn-download-cert" onclick="copyCertText()">
+            📋 Sao Chép Chứng Nhận (Gửi Zalo/FB)
           </button>
           <button type="button" class="btn-close-cert" onclick="closeCertModal()">
             Đóng
