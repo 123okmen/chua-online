@@ -1,3 +1,22 @@
+
+// Hệ thống thông báo tâm linh Toast Notification (thay thế alert truyền thống không bao giờ đơ)
+function showZenToast(message) {
+  let toast = document.getElementById("zenToastBox");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "zenToastBox";
+    toast.className = "zen-toast-box";
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = message.replace(/\n/g, "<br>");
+  toast.classList.add("visible");
+  
+  if (window._zenToastTimer) clearTimeout(window._zenToastTimer);
+  window._zenToastTimer = setTimeout(() => {
+    toast.classList.remove("visible");
+  }, 3200);
+}
+
 /**
  * =========================================================================
  * CHÙA ONLINE 4.0 — TỊNH TÂM TÍCH ĐỨC & TU TẠI GIA
@@ -375,6 +394,28 @@ function toggleZenMusic() {
   } catch {}
 }
 
+function updateMusicButtonsState() {
+  const icon = document.getElementById("zenMusicIcon");
+  const btnHead = document.getElementById("btnZenMusic");
+  const btnPage = document.getElementById("btnToggleMusicPage");
+  
+  if (isZenMusicPlaying) {
+    if (btnHead) btnHead.classList.add("active");
+    if (icon) icon.textContent = "🎶";
+    if (btnPage) {
+      btnPage.textContent = "⏹ Dừng Nhạc Thiền";
+      btnPage.classList.add("playing");
+    }
+  } else {
+    if (btnHead) btnHead.classList.remove("active");
+    if (icon) icon.textContent = "🎵";
+    if (btnPage) {
+      btnPage.textContent = "▶ Bật Nhạc Thiền";
+      btnPage.classList.remove("playing");
+    }
+  }
+}
+
 function startZenAmbient() {
   try {
     if (!audioCtx) return;
@@ -407,10 +448,7 @@ function startZenAmbient() {
     });
 
     isZenMusicPlaying = true;
-    const btn = document.getElementById("btnZenMusic");
-    if (btn) btn.classList.add("active");
-    const icon = document.getElementById("zenMusicIcon");
-    if (icon) icon.textContent = "🎶";
+    updateMusicButtonsState();
   } catch (err) {
     console.warn("startZenAmbient error:", err);
   }
@@ -425,10 +463,7 @@ function stopZenAmbient() {
   });
   zenOscillatorNodes = [];
   isZenMusicPlaying = false;
-  const btn = document.getElementById("btnZenMusic");
-  if (btn) btn.classList.remove("active");
-  const icon = document.getElementById("zenMusicIcon");
-  if (icon) icon.textContent = "🎵";
+  updateMusicButtonsState();
 }
 
 function triggerHaptic(duration) {
@@ -701,7 +736,7 @@ function finishIncense() {
   document.getElementById("incenseCountdown").textContent = "HOÀN TẤT";
   addMerit(100);
   playBellSound();
-  alert("✨ Lễ Dâng Hương Hoàn Tất!\nNguyện ước bình an của bạn đã được chứng giám. +100 Công đức lành!");
+  showZenToast("✨ Lễ Dâng Hương Hoàn Tất!\nNguyện ước bình an đã được chứng giám. +100 Công đức lành!");
 }
 
 // =========================================================================
@@ -808,7 +843,7 @@ function saveFortuneToHistory() {
   appState.savedFortunes.unshift(item);
   saveState();
   renderSavedFortunes();
-  alert("⭐ Đã lưu quẻ xăm vào Sổ Công Đức thành công!");
+  showZenToast("⭐ Đã lưu quẻ xăm vào Sổ Công Đức thành công!");
 }
 
 function resetFortune() {
@@ -1064,7 +1099,7 @@ function offerItem(type) {
     }, 400);
   }
 
-  alert(`🌸 Dâng lễ thành công!\nBạn vừa thành tâm dâng ${label} lên Tam Bảo. +${meritGain} Công đức lành!`);
+  showZenToast(`🌸 Dâng lễ thành công!\nBạn vừa thành tâm dâng ${label} lên Tam Bảo. +${meritGain} Công đức lành!`);
 }
 
 // =========================================================================
@@ -1104,6 +1139,17 @@ function addMerit(amount) {
 }
 
 function updateUI() {
+  // Đồng bộ trạng thái vào trang Cài Đặt
+  const pCheck = document.getElementById("pageSoundCheck");
+  if (pCheck) pCheck.checked = appState.soundEnabled;
+  const hCheck = document.getElementById("pageHapticCheck");
+  if (hCheck) hCheck.checked = appState.hapticEnabled;
+  const pVol = document.getElementById("pageVolumeRange");
+  if (pVol) pVol.value = Math.round(appState.masterVolume * 100);
+  const vLbl = document.getElementById("volumeValueLabel");
+  if (vLbl) vLbl.textContent = `${Math.round(appState.masterVolume * 100)}%`;
+  updateMusicButtonsState();
+
   // Cập nhật ngày & chuỗi ngày tinh tấn
   const todayStr = new Date().toLocaleDateString("vi-VN");
   if (appState.lastActiveDate !== todayStr) {
@@ -1199,17 +1245,38 @@ function closeSettingsModal() {
 
 function toggleSoundEffects(enabled) {
   appState.soundEnabled = enabled;
+  const pCheck = document.getElementById("pageSoundCheck");
+  if (pCheck) pCheck.checked = enabled;
   saveState();
+  if (enabled) playMoyuSound();
 }
 
 function toggleHaptic(enabled) {
   appState.hapticEnabled = enabled;
+  const hCheck = document.getElementById("pageHapticCheck");
+  if (hCheck) hCheck.checked = enabled;
   saveState();
+  if (enabled) triggerHaptic(30);
 }
 
 function changeMasterVolume(val) {
   appState.masterVolume = parseInt(val, 10) / 100.0;
+  const lbl = document.getElementById("volumeValueLabel");
+  if (lbl) lbl.textContent = `${val}%`;
+  const pR = document.getElementById("pageVolumeRange");
+  if (pR) pR.value = val;
   saveState();
+}
+
+function exportDataBackup() {
+  const jsonStr = JSON.stringify(appState, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Chua_Online_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function confirmResetMerit() {
@@ -1226,7 +1293,7 @@ function confirmResetMerit() {
     saveState();
     updateUI();
     renderSavedFortunes();
-    alert("Đã làm mới sổ công đức thành công!");
+    showZenToast("✓ Đã làm mới sổ công đức thành công!");
   }
 }
 
@@ -1280,9 +1347,23 @@ function generateMeritCertificate() {
   ctx.font = "14px 'Segoe UI', sans-serif";
   ctx.fillText(`Ngày chứng thực: ${new Date().toLocaleDateString("vi-VN")}`, 400, 510);
 
+  // Hiển thị trực tiếp vào popup modal trong app (không bị chặn popup)
   const dataUrl = canvas.toDataURL("image/png");
-  const win = window.open();
-  win.document.write(`<title>Chứng Nhận Công Đức</title><body style="margin:0;background:#090b10;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${dataUrl}" style="max-width:90%;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.8);"/></body>`);
+  const img = document.getElementById("certImagePreview");
+  const downloadLink = document.getElementById("btnDownloadCert");
+  const modal = document.getElementById("certModal");
+
+  if (img) img.src = dataUrl;
+  if (downloadLink) downloadLink.href = dataUrl;
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeCertModal(e) {
+  if (e && e.target && e.target.id !== "certModal" && !e.target.classList.contains("modal-close") && !e.target.classList.contains("btn-close-cert")) {
+    return;
+  }
+  const modal = document.getElementById("certModal");
+  if (modal) modal.classList.add("hidden");
 }
 
 // Khởi động ứng dụng trực tiếp không qua mật mã

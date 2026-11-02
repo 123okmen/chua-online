@@ -56,7 +56,7 @@
           <button class="icon-action-btn" id="btnZenMusic" onclick="toggleZenMusic()" title="Bật/Tắt Nhạc Thiền Tịnh Tâm">
             <span id="zenMusicIcon">🎵</span>
           </button>
-          <button class="icon-action-btn" onclick="openSettingsModal()" title="Cài đặt & Đổi mật mã">
+          <button class="icon-action-btn" onclick="switchTab('settings')" title="Cài đặt hệ thống">
             ⚙️
           </button>
 
@@ -94,6 +94,10 @@
         <button class="nav-btn" data-tab="ledger" onclick="switchTab('ledger')">
           <span class="nav-emoji">📒</span>
           <span class="nav-text">Sổ Công Đức</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+          <span class="nav-emoji">⚙️</span>
+          <span class="nav-text">Cài Đặt</span>
         </button>
       </div>
     </nav>
@@ -650,6 +654,118 @@
         </div>
       </section>
 
+
+      <!-- ============================================================== -->
+      <!-- TAB 8: CÀI ĐẶT HỆ THỐNG TRỰC TIẾP (SYSTEM SETTINGS) -->
+      <!-- ============================================================== -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="settings-page-container">
+          <div class="panel-header-badge">
+            <h2>⚙️ Cài Đặt Hệ Thống & Tùy Chỉnh</h2>
+            <p>Tùy chỉnh âm thanh, rung, tốc độ gõ mõ và giao diện theo ý muốn</p>
+          </div>
+
+          <div class="settings-card-group">
+            <!-- Nhóm 1: Âm thanh & Rung -->
+            <div class="settings-card">
+              <div class="sc-header">
+                <span class="sc-icon">🔊</span>
+                <div>
+                  <h3 class="sc-title">Âm Thanh & Rung Phản Hồi</h3>
+                  <p class="sc-desc">Tùy chỉnh tiếng gõ mõ, thỉnh chuông và rung haptic</p>
+                </div>
+              </div>
+
+              <div class="sc-body">
+                <div class="setting-toggle-row">
+                  <div>
+                    <strong>Tiếng Mõ & Chuông Bát Nhã</strong>
+                    <p class="toggle-sub">Phát âm thanh mô phỏng Web Audio chân thực</p>
+                  </div>
+                  <label class="switch-toggle">
+                    <input type="checkbox" id="pageSoundCheck" checked onchange="toggleSoundEffects(this.checked)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="setting-toggle-row">
+                  <div>
+                    <strong>Rung Haptic Trên Điện Thoại</strong>
+                    <p class="toggle-sub">Điện thoại rung êm nhẹ theo từng nhịp gõ mõ</p>
+                  </div>
+                  <label class="switch-toggle">
+                    <input type="checkbox" id="pageHapticCheck" checked onchange="toggleHaptic(this.checked)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="slider-setting-box">
+                  <div class="slider-header">
+                    <strong>Âm Lượng Tổng</strong>
+                    <span id="volumeValueLabel">80%</span>
+                  </div>
+                  <input type="range" id="pageVolumeRange" min="0" max="100" value="80" oninput="changeMasterVolume(this.value)">
+                </div>
+              </div>
+            </div>
+
+            <!-- Nhóm 2: Nhạc Thiền & Không Gian -->
+            <div class="settings-card">
+              <div class="sc-header">
+                <span class="sc-icon">🎶</span>
+                <div>
+                  <h3 class="sc-title">Nhạc Thiền Tịnh Tâm (Ambient)</h3>
+                  <p class="sc-desc">Hòa âm ngũ cung Đông phương thanh lọc tâm trí</p>
+                </div>
+              </div>
+
+              <div class="sc-body">
+                <div class="setting-toggle-row">
+                  <div>
+                    <strong>Bật / Tắt Nhạc Thiền Ngũ Cung</strong>
+                    <p class="toggle-sub">Giúp thư giãn, giảm căng thẳng và dễ ngủ</p>
+                  </div>
+                  <button type="button" class="btn-play-zen-music" id="btnToggleMusicPage" onclick="toggleZenMusic()">
+                    ▶ Bật Nhạc Thiền
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nhóm 3: Dữ liệu & Đặt lại -->
+            <div class="settings-card">
+              <div class="sc-header">
+                <span class="sc-icon">💾</span>
+                <div>
+                  <h3 class="sc-title">Quản Lý Dữ Liệu Công Đức</h3>
+                  <p class="sc-desc">Sao lưu và bảo tồn lịch sử tu tập trên thiết bị</p>
+                </div>
+              </div>
+
+              <div class="sc-body">
+                <div class="data-actions-row">
+                  <button type="button" class="btn-data-action" onclick="exportDataBackup()">
+                    📥 Sao Lưu Dữ Liệu (Tải File)
+                  </button>
+                  <button type="button" class="btn-data-action btn-danger" onclick="confirmResetMerit()">
+                    ⚠️ Đặt Lại Số Liệu Về 0
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thông tin ứng dụng -->
+            <div class="app-info-card">
+              <div class="aic-logo">🪷</div>
+              <div class="aic-details">
+                <strong>CHÙA ONLINE 4.0 — PHIÊN BẢN 2026</strong>
+                <p>Ứng dụng tu tập & tích đức tại gia hiện đại nhất • Phát triển bởi Hermes Agent AI</p>
+                <span class="aic-status">✓ 100% Hoạt động mượt mà, Offline Ready, Không giật lag</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- FOOTER THANH TỊNH -->
@@ -662,36 +778,27 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- MODAL CÀI ĐẶT & ĐỔI MẬT MÃ BẢO MẬT -->
-  <!-- ========================================================================= -->
-  <div class="modal-overlay hidden" id="settingsModal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>⚙️ Cài Đặt Hệ Thống</h3>
-        <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+  
+  <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC -->
+  <div class="modal-overlay hidden" id="certModal" onclick="closeCertModal(event)">
+    <div class="cert-modal-dialog" onclick="event.stopPropagation()">
+      <div class="cert-modal-header">
+        <h3>🏆 Chứng Nhận Công Đức Tu Tập</h3>
+        <button type="button" class="modal-close" onclick="closeCertModal()">&times;</button>
       </div>
-
-      <div class="modal-body">
-        <!-- Cài đặt Âm thanh -->
-        <div class="setting-group">
-          <h4>🔊 Cài Đặt Âm Thanh & Rung</h4>
-          <div class="setting-toggle-row">
-            <span>Tiếng Mõ & Chuông (Web Audio)</span>
-            <input type="checkbox" id="soundEffectCheck" checked onchange="toggleSoundEffects(this.checked)">
-          </div>
-          <div class="setting-toggle-row">
-            <span>Rung Haptic trên điện thoại khi gõ</span>
-            <input type="checkbox" id="hapticCheck" checked onchange="toggleHaptic(this.checked)">
-          </div>
-          <div class="setting-toggle-row">
-            <span>Âm lượng tiếng mõ/chuông:</span>
-            <input type="range" id="volumeRange" min="0" max="100" value="80" oninput="changeMasterVolume(this.value)">
-          </div>
+      <div class="cert-modal-body">
+        <img id="certImagePreview" class="cert-preview-img" alt="Chứng nhận công đức">
+        <div class="cert-actions">
+          <a id="btnDownloadCert" class="btn-download-cert" download="Chung_Nhan_Cong_Duc_Chua_Online.png">
+            💾 Tải Ảnh Về Máy
+          </a>
+          <button type="button" class="btn-close-cert" onclick="closeCertModal()">
+            Đóng
+          </button>
         </div>
       </div>
     </div>
   </div>
-
   <!-- Script logic ứng dụng -->
   <script src="app.js"></script>
 </body>
