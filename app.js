@@ -9,7 +9,7 @@
 // =========================================================================
 // 1. DỮ LIỆU KHỞI TẠO & QUẢN LÝ TRẠNG THÁI (APP STATE)
 // =========================================================================
-const DEFAULT_PIN = "1234";
+const DEFAULT_PIN = "2002";
 
 const BLESSING_THEMES = {
   all: [
@@ -503,20 +503,19 @@ function updatePinDots() {
 
 function verifyPin() {
   const errMsg = document.getElementById("lockErrorMsg");
-  const storedPin = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
+  const storedPin = DEFAULT_PIN; // Cố định 2002
 
-  // Nếu khớp mật mã đã lưu hoặc mật mã mặc định 1234
-  if (currentPinInput === storedPin || currentPinInput === DEFAULT_PIN || currentPinInput === "1234") {
+  // Chấp nhận mật mã 2002
+  if (currentPinInput === DEFAULT_PIN || currentPinInput === "2002") {
     if (errMsg) {
-      errMsg.textContent = "✓ Mật mã chính xác! Đang mở cửa thiền môn...";
+      errMsg.textContent = "✓ Mật mã 2002 chính xác! Đang mở cửa thiền môn...";
       errMsg.style.color = "#34d399";
     }
     setTimeout(unlockAppDirectly, 100);
   } else {
-    // Nếu nhập mã mới chưa khớp
     if (errMsg) {
-      errMsg.innerHTML = `Mật mã chưa khớp (Mặc định: <strong>1234</strong>).<br><button type="button" class="btn-set-as-new" onclick="setEnteredPinAsNew()">👉 Bấm để lưu [${currentPinInput}] làm Mật Mã Mới</button>`;
-      errMsg.style.color = "#f59e0b";
+      errMsg.innerHTML = `Mật mã không đúng. Vui lòng nhập mật mã mặc định: <strong style="color:#facc15; font-size:1.1rem;">2002</strong>`;
+      errMsg.style.color = "#f87171";
     }
     triggerHaptic([50, 40, 50]);
 
@@ -525,43 +524,14 @@ function verifyPin() {
       pinBox.classList.add("shake-error");
       setTimeout(() => {
         pinBox.classList.remove("shake-error");
+        clearPin();
       }, 400);
     }
   }
 }
 
-function setEnteredPinAsNew() {
-  if (currentPinInput.length === 4 && /^\d{4}$/.test(currentPinInput)) {
-    localStorage.setItem("chua_online_passcode", currentPinInput);
-    appState.passcode = currentPinInput;
-    const errMsg = document.getElementById("lockErrorMsg");
-    if (errMsg) {
-      errMsg.textContent = `✓ Đã lưu mật mã mới [${currentPinInput}]! Đang vào chùa...`;
-      errMsg.style.color = "#34d399";
-    }
-    setTimeout(unlockAppDirectly, 150);
-  } else {
-    unlockAppDirectly();
-  }
-}
-
-function promptCustomPinOnLock() {
-  const custom = prompt("Nhập mã PIN 4 chữ số mới bạn muốn đặt (VD: 6868 hoặc 2026):", "1234");
-  if (custom !== null) {
-    const clean = custom.trim();
-    if (/^\d{4}$/.test(clean)) {
-      localStorage.setItem("chua_online_passcode", clean);
-      appState.passcode = clean;
-      alert(`✓ Đã lưu mật mã mới: ${clean}\nĐang mở cửa chùa cho bạn!`);
-      unlockAppDirectly();
-    } else {
-      alert("❌ Mật mã phải gồm đúng 4 chữ số! Vui lòng thử lại.");
-    }
-  }
-}
-
 function quickUnlock() {
-  currentPinInput = "1234";
+  currentPinInput = "2002";
   updatePinDots();
   unlockAppDirectly();
 }
@@ -1407,7 +1377,7 @@ function openSettingsModal() {
   const modal = document.getElementById("settingsModal");
   if (modal) modal.classList.remove("hidden");
   
-  const curPin = localStorage.getItem("chua_online_passcode") || DEFAULT_PIN;
+  const curPin = "2002";
   const curDisplay = document.getElementById("currentPinDisplay");
   if (curDisplay) curDisplay.textContent = curPin;
 
@@ -1423,61 +1393,7 @@ function closeSettingsModal() {
   if (notice) notice.textContent = "";
 }
 
-function saveNewPasscode() {
-  const newPinInp = document.getElementById("inputNewPin");
-  const confirmPinInp = document.getElementById("inputConfirmPin");
-  const notice = document.getElementById("pinChangeNotice");
-
-  const newPin = newPinInp ? newPinInp.value.trim() : "";
-  const confirmPin = confirmPinInp ? confirmPinInp.value.trim() : "";
-
-  if (!/^\d{4}$/.test(newPin)) {
-    if (notice) {
-      notice.textContent = "❌ Mật mã mới phải gồm đúng 4 chữ số (VD: 6868)!";
-      notice.style.color = "#f87171";
-    }
-    return;
-  }
-  if (newPin !== confirmPin) {
-    if (notice) {
-      notice.textContent = "❌ Xác nhận mật mã mới không khớp!";
-      notice.style.color = "#f87171";
-    }
-    return;
-  }
-
-  localStorage.setItem("chua_online_passcode", newPin);
-  appState.passcode = newPin;
-
-  const curDisplay = document.getElementById("currentPinDisplay");
-  if (curDisplay) curDisplay.textContent = newPin;
-
-  if (notice) {
-    notice.textContent = `✓ Đã đổi mật mã thành [${newPin}] thành công!`;
-    notice.style.color = "#34d399";
-  }
-
-  if (newPinInp) newPinInp.value = "";
-  if (confirmPinInp) confirmPinInp.value = "";
-
-  triggerHaptic([30, 40]);
-  setTimeout(closeSettingsModal, 1200);
-}
-
-function resetDefaultPasscode() {
-  localStorage.setItem("chua_online_passcode", DEFAULT_PIN);
-  appState.passcode = DEFAULT_PIN;
-  const curDisplay = document.getElementById("currentPinDisplay");
-  if (curDisplay) curDisplay.textContent = DEFAULT_PIN;
-
-  const notice = document.getElementById("pinChangeNotice");
-  if (notice) {
-    notice.textContent = "✓ Đã khôi phục mật mã về mặc định: 1234!";
-    notice.style.color = "#34d399";
-  }
-  triggerHaptic(30);
-  setTimeout(closeSettingsModal, 1200);
-}
+// Mật mã mở khóa cố định là 2002 theo yêu cầu
 
 function toggleSoundEffects(enabled) {
   appState.soundEnabled = enabled;
