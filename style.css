@@ -46,6 +46,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* QUY TẮC BẮT BUỘC ĐỂ ẨN CÁC MODAL, POPUP & FORM KHI CHƯA MỞ */
+.hidden,
+.modal-overlay.hidden,
+.fortune-result-card.hidden,
+.cert-preview-img.hidden,
+[hidden] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 input, textarea, select {
   user-select: text !important;
   -webkit-user-select: text !important;
@@ -1874,13 +1886,21 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.75);
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .modal-dialog {

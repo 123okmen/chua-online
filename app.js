@@ -822,8 +822,11 @@ function revealFortune() {
   document.getElementById("cardAdviceText").textContent = fortune.advice;
 
   const card = document.getElementById("fortuneResultCard");
-  card.classList.remove("hidden");
-  card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (card) {
+    card.classList.remove("hidden");
+    card.style.display = "block";
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 
   playBellSound();
   addMerit(30);
@@ -847,7 +850,11 @@ function saveFortuneToHistory() {
 }
 
 function resetFortune() {
-  document.getElementById("fortuneResultCard").classList.add("hidden");
+  const card = document.getElementById("fortuneResultCard");
+  if (card) {
+    card.classList.add("hidden");
+    card.style.display = "none";
+  }
   window.scrollTo({ top: 120, behavior: "smooth" });
 }
 
@@ -1329,7 +1336,10 @@ function generateMeritCertificate() {
   if (dateEl) dateEl.textContent = `Ngày chứng thực: ${new Date().toLocaleDateString("vi-VN")}`;
 
   const modal = document.getElementById("certModal");
-  if (modal) modal.classList.remove("hidden");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+  }
 
   playBellSound();
 }
@@ -1360,7 +1370,10 @@ function closeCertModal(e) {
     return;
   }
   const modal = document.getElementById("certModal");
-  if (modal) modal.classList.add("hidden");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+  }
 }
 
 // Khởi động ứng dụng trực tiếp không qua mật mã
@@ -1382,4 +1395,11 @@ window.addEventListener("DOMContentLoaded", () => {
   try {
     setTimeout(initPondCanvas, 200);
   } catch {}
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeCertModal();
+    if (typeof closeProfileModal === "function") closeProfileModal();
+  }
 });

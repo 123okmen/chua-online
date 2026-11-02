@@ -898,13 +898,24 @@ function openProfileModal() {
   const modal = document.getElementById("profileModal");
   if (modal) {
     modal.classList.remove("hidden");
-    document.getElementById("inputDharmaName").value = currentUserProfile.name;
+    modal.style.display = "flex";
+    const inp = document.getElementById("inputDharmaName");
+    if (inp) {
+      inp.value = currentUserProfile.name;
+      setTimeout(() => inp.focus(), 100);
+    }
   }
 }
 
-function closeProfileModal() {
+function closeProfileModal(e) {
+  if (e && e.target && e.target.id !== "profileModal" && !e.target.classList.contains("modal-close") && !e.target.classList.contains("btn-close-modal")) {
+    return;
+  }
   const modal = document.getElementById("profileModal");
-  if (modal) modal.classList.add("hidden");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+  }
 }
 
 function saveProfileSettings() {

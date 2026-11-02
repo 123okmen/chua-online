@@ -513,7 +513,7 @@
           </div>
 
           <!-- MÀN HÌNH HIỂN THỊ KẾT QUẢ QUẺ XĂM LINH ỨNG -->
-          <div class="fortune-result-card hidden" id="fortuneResultCard">
+          <div class="fortune-result-card hidden" id="fortuneResultCard" style="display: none;">
             <div class="fortune-card-banner">
               <span class="fortune-rank-pill" id="cardRankPill">THƯỢNG THƯỢNG (ĐẠI CÁT)</span>
               <h3 class="fortune-number-title" id="cardNumberTitle">QUẺ SỐ 01</h3>
@@ -892,7 +892,7 @@
   <!-- ========================================================================= -->
   
   <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC (THIẾT KẾ THIỀN MÔN THUẦN HTML/CSS CHỐNG LỖI 100%) -->
-  <div class="modal-overlay hidden" id="certModal" onclick="closeCertModal(event)">
+  <div class="modal-overlay hidden" id="certModal" style="display: none;" onclick="closeCertModal(event)">
     <div class="cert-modal-dialog" onclick="event.stopPropagation()">
       <div class="cert-modal-header">
         <h3>🏆 Chứng Nhận Công Đức Tu Tập</h3>
@@ -963,7 +963,7 @@
   <script src="app.js"></script>
 
   <!-- MODAL ĐỔI PHÁP DANH & TRANG PHỤC PHẬT TỬ -->
-  <div class="modal-overlay hidden" id="profileModal" onclick="closeProfileModal(event)">
+  <div class="modal-overlay hidden" id="profileModal" style="display: none;" onclick="closeProfileModal(event)">
     <div class="modal-dialog" onclick="event.stopPropagation()">
       <div class="modal-header">
         <h3>👤 Tùy Chỉnh Pháp Danh & Pháp Phục</h3>
@@ -985,9 +985,14 @@
           </select>
         </div>
 
-        <button type="button" class="btn-save-pin" onclick="saveProfileSettings()">
-          💾 Lưu Thông Tin Vào Chánh Điện
-        </button>
+        <div style="display: flex; gap: 0.65rem; margin-top: 0.5rem;">
+          <button type="button" class="btn-save-pin" style="flex: 1.8;" onclick="saveProfileSettings()">
+            💾 Lưu Thông Tin
+          </button>
+          <button type="button" class="btn-close-modal" style="flex: 1; padding: 0.65rem; border-radius: 10px; background: rgba(255,255,255,0.08); border: 1px solid var(--border-subtle); color: var(--text-primary); font-weight: 700; font-size: 0.84rem; cursor: pointer;" onclick="closeProfileModal()">
+            Đóng
+          </button>
+        </div>
       </div>
     </div>
   </div>
