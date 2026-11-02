@@ -67,7 +67,11 @@
     <!-- THANH ĐIỀU HƯỚNG TÁC VỤ TU TẬP (NAV TABS) -->
     <nav class="nav-scroll-wrapper">
       <div class="nav-bar">
-        <button class="nav-btn active" data-tab="moyu" onclick="switchTab('moyu')">
+        <button class="nav-btn active" data-tab="temple3d" onclick="switchTab('temple3d')">
+          <span class="nav-emoji">🛕</span>
+          <span class="nav-text">Chánh Điện 3D</span>
+        </button>
+        <button class="nav-btn" data-tab="moyu" onclick="switchTab('moyu')">
           <span class="nav-emoji">🪵</span>
           <span class="nav-text">Gõ Mõ</span>
         </button>
@@ -104,11 +108,119 @@
 
     <!-- KHÔNG GIAN NỘI DUNG TỪNG PHÂN HỆ -->
     <main class="app-body">
+      <!-- ============================================================== -->
+      <!-- TAB 0: CHÁNH ĐIỆN 3D & ĐẠO TRÀNG TÂM GIAO (3D TEMPLE & LIVE CHAT) -->
+      <!-- ============================================================== -->
+      <section id="tab-temple3d" class="tab-panel active">
+        <div class="temple3d-layout-container">
+          <div class="panel-header-badge">
+            <h2>🛕 Chánh Điện 3D & Đạo Tràng Tâm Giao</h2>
+            <p>Không gian Chánh Điện trang nghiêm • Người vào lễ Phật & Trò chuyện trực tuyến</p>
+          </div>
+
+          <div class="temple3d-main-grid">
+            <!-- CỘT TRÁI: VIEWPORT 3D CHÁNH ĐIỆN VỚI NGƯỜI ĐI LỄ CHÙA -->
+            <div class="temple3d-viewport-card">
+              <div class="viewport-header-bar">
+                <div class="vh-title">
+                  <span class="live-pulse-dot"></span>
+                  <strong>Chánh Điện Tam Bảo 3D</strong>
+                </div>
+                <div class="camera-modes-bar">
+                  <button type="button" class="btn-cam-view active" data-mode="overview" onclick="setCameraMode('overview')">
+                    Toàn Cảnh
+                  </button>
+                  <button type="button" class="btn-cam-view" data-mode="user" onclick="setCameraMode('user')">
+                    Góc Nhìn Của Bạn
+                  </button>
+                  <button type="button" class="btn-cam-view" data-mode="altar" onclick="setCameraMode('altar')">
+                    Bàn Thờ Phật
+                  </button>
+                </div>
+              </div>
+
+              <!-- Vùng hiển thị Three.js 3D Viewport -->
+              <div class="temple3d-canvas-wrapper">
+                <div id="temple3dViewport" class="temple3d-viewport"></div>
+                <!-- Lớp phủ 2D hiển thị Thẻ tên & Bong bóng thoại 3D -->
+                <div id="temple3dOverlay" class="temple3d-overlay"></div>
+              </div>
+
+              <div class="viewport-drag-hint">
+                <span>🖱️ Kéo chuột hoặc vuốt tay trên điện thoại để xoay 360° quan sát Chánh Điện</span>
+              </div>
+
+              <!-- Thanh thao tác lễ chùa của nhân vật người dùng -->
+              <div class="avatar-action-toolbar">
+                <button type="button" class="btn-avatar-action" onclick="performUserAction('bowing')">
+                  🙏 Lạy Phật (+15 Đức)
+                </button>
+                <button type="button" class="btn-avatar-action" onclick="performUserAction('offering')">
+                  🕯️ Dâng Hương (+20 Đức)
+                </button>
+                <button type="button" class="btn-avatar-action" onclick="performUserAction('meditating')">
+                  🧘 Tọa Thiền (+25 Đức)
+                </button>
+                <button type="button" class="btn-avatar-action btn-change-profile" onclick="openProfileModal()">
+                  👤 Đổi Pháp Danh
+                </button>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: PHÒNG CHAT ĐẠO TRÀNG TRỰC TUYẾN -->
+            <div class="temple-chat-card">
+              <div class="chat-header">
+                <div class="chat-title-box">
+                  <div class="chat-title-row">
+                    <span class="chat-temple-icon">💬</span>
+                    <h3>Đạo Tràng Tâm Giao</h3>
+                  </div>
+                  <span class="chat-online-count">🟢 12 Đạo hữu đang trong Chánh Điện</span>
+                </div>
+                <button type="button" class="btn-profile-edit" onclick="openProfileModal()" title="Tùy chỉnh tên và áo tràng">
+                  ⚙️ Pháp Phục
+                </button>
+              </div>
+
+              <!-- Dòng tin nhắn trực tuyến (Chat Stream) -->
+              <div id="templeChatStream" class="chat-stream-container"></div>
+
+              <!-- Hàng phím tắt Niệm Phật Nhanh -->
+              <div class="quick-prayer-chips">
+                <button type="button" class="qp-chip" onclick="sendQuickPrayer('Nam Mô A Di Đà Phật! 🙏')">
+                  🙏 Nam Mô A Di Đà Phật
+                </button>
+                <button type="button" class="qp-chip" onclick="sendQuickPrayer('Nam Mô Quán Thế Âm Bồ Tát! 🪷')">
+                  🪷 Nam Mô Quán Thế Âm
+                </button>
+                <button type="button" class="qp-chip" onclick="sendQuickPrayer('Nguyện cầu gia đạo bình an, tai qua nạn khỏi ✨')">
+                  ✨ Cầu Gia Đạo Bình An
+                </button>
+                <button type="button" class="qp-chip" onclick="sendQuickPrayer('Chúc quý đạo hữu vạn sự hanh thông, phát tài phát lộc 💰')">
+                  💰 Vạn Sự Hanh Thông
+                </button>
+                <button type="button" class="qp-chip" onclick="sendQuickPrayer('Thân tâm an lạc, bồ đề tâm kiên cố 🍃')">
+                  🍃 Thân Tâm An Lạc
+                </button>
+              </div>
+
+              <!-- Khung soạn tin nhắn -->
+              <form class="chat-input-row" onsubmit="event.preventDefault(); sendUserChatMessage();">
+                <input type="text" id="chatTextInput" class="chat-input-field" placeholder="Nhập lời nguyện hoặc trò chuyện cùng đạo tràng..." autocomplete="off">
+                <button type="submit" class="btn-chat-send" title="Gửi tin nhắn">
+                  🕊️ Gửi
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       <!-- ============================================================== -->
       <!-- TAB 1: GÕ MÕ TỤNG KINH (VIRTUAL MUYU - GÕ MÕ TÍCH ĐỨC) -->
       <!-- ============================================================== -->
-      <section id="tab-moyu" class="tab-panel active">
+      <section id="tab-moyu" class="tab-panel">
         <div class="moyu-container">
           <!-- Hào quang Phật pháp -->
           <div class="buddha-aura" id="buddhaAura"></div>
@@ -844,7 +956,41 @@
       </div>
     </div>
   </div>
+  <!-- Thư viện Three.js 3D & Logic Chánh Điện 3D -->
+  <script src="three.min.js"></script>
+  <script src="temple3d.js"></script>
   <!-- Script logic ứng dụng -->
   <script src="app.js"></script>
+
+  <!-- MODAL ĐỔI PHÁP DANH & TRANG PHỤC PHẬT TỬ -->
+  <div class="modal-overlay hidden" id="profileModal" onclick="closeProfileModal(event)">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>👤 Tùy Chỉnh Pháp Danh & Pháp Phục</h3>
+        <button type="button" class="modal-close" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <h4>Pháp Danh / Tên Hiển Thị Trong Chánh Điện</h4>
+          <input type="text" id="inputDharmaName" class="form-input" placeholder="Nhập tên hoặc pháp danh (VD: Phật Tử Diệu Tâm)..." maxlength="30">
+        </div>
+
+        <div class="setting-group">
+          <h4>Màu Sắc Pháp Phục 3D</h4>
+          <select id="selectRobeColor" class="form-input" style="cursor:pointer;">
+            <option value="#3b82f6" selected>Áo Lam Truyền Thống (Xanh Lam)</option>
+            <option value="#78350f">Áo Nâu Sòng Giản Dị (Nâu Đất)</option>
+            <option value="#f8fafc">Áo Trắng Cư Sĩ Thanh Tịnh (Trắng Tinh)</option>
+            <option value="#f59e0b">Áo Vàng Phật Tử Tinh Tấn (Vàng Kim)</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-save-pin" onclick="saveProfileSettings()">
+          💾 Lưu Thông Tin Vào Chánh Điện
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

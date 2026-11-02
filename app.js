@@ -1121,8 +1121,13 @@ function switchTab(tabId) {
     panel.classList.toggle("active", panel.id === `tab-${tabId}`);
   });
 
-  // Khởi chạy canvas tương ứng
-  if (tabId === "pond") {
+  // Khởi chạy 3D / canvas tương ứng
+  if (tabId === "temple3d") {
+    setTimeout(() => {
+      if (typeof initTemple3D === "function") initTemple3D();
+      if (typeof onTempleWindowResize === "function") onTempleWindowResize();
+    }, 60);
+  } else if (tabId === "pond") {
     setTimeout(initPondCanvas, 50);
   } else if (tabId === "incense") {
     setTimeout(initSmokeCanvas, 50);
@@ -1364,9 +1369,17 @@ window.addEventListener("DOMContentLoaded", () => {
   appState.unlocked = true;
   updateUI();
   try {
-    setTimeout(initSmokeCanvas, 100);
+    setTimeout(() => {
+      if (typeof initTemple3D === "function") initTemple3D();
+      if (typeof initTempleChat === "function") initTempleChat();
+    }, 100);
+  } catch (err) {
+    console.warn("Init 3D warning:", err);
+  }
+  try {
+    setTimeout(initSmokeCanvas, 200);
   } catch {}
   try {
-    setTimeout(initPondCanvas, 100);
+    setTimeout(initPondCanvas, 200);
   } catch {}
 });

@@ -2733,3 +2733,505 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* =========================================================================
+   TAB 0: CHÁNH ĐIỆN 3D & ĐẠO TRÀNG TÂM GIAO
+   ========================================================================= */
+.temple3d-layout-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.temple3d-main-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+/* 1. KHUNG 3D VIEWPORT */
+.temple3d-viewport-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+  display: flex;
+  flex-direction: column;
+}
+
+.viewport-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.vh-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--gold-300);
+}
+
+.live-pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulseGreen 1.5s infinite;
+}
+
+.camera-modes-bar {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.btn-cam-view {
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cam-view:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-cam-view.active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: var(--gold-500);
+  color: var(--gold-300);
+}
+
+/* Canvas Viewport */
+.temple3d-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  background: #0a0c13;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.temple3d-canvas-wrapper:active {
+  cursor: grabbing;
+}
+
+.temple3d-viewport {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.temple3d-viewport canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Lớp phủ nhãn tên & bong bóng thoại 3D */
+.temple3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.avatar-3d-tag {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.name-badge-3d {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 12px;
+  padding: 2px 7px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gold-300);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.name-badge-3d.user-badge {
+  background: rgba(2, 132, 199, 0.85);
+  border-color: #38bdf8;
+  color: #fff;
+  font-weight: 800;
+}
+
+.speech-bubble-3d {
+  position: relative;
+  background: rgba(254, 243, 199, 0.96);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 4px 9px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #78350f;
+  max-width: 160px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  animation: popInBubble 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.speech-bubble-3d::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 5px 0 5px;
+  border-style: solid;
+  border-color: #f59e0b transparent transparent transparent;
+}
+
+.viewport-drag-hint {
+  padding: 0.35rem 0.85rem;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: center;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Thanh hành động lễ Phật của người dùng */
+.avatar-action-toolbar {
+  display: flex;
+  padding: 0.65rem 0.85rem;
+  gap: 0.5rem;
+  background: rgba(18, 22, 34, 0.95);
+  border-top: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.btn-avatar-action {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.btn-avatar-action:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: var(--border-gold);
+  color: var(--gold-300);
+}
+
+.btn-avatar-action:active {
+  transform: scale(0.95);
+}
+
+.btn-avatar-action.btn-change-profile {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(2, 132, 199, 0.4);
+  color: #38bdf8;
+}
+
+/* 2. CỘT PHÒNG CHAT ĐẠO TRÀNG */
+.temple-chat-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  height: 560px;
+}
+
+.chat-header {
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-title-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chat-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chat-title-row h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--gold-400);
+}
+
+.chat-online-count {
+  font-size: 0.7rem;
+  color: #34d399;
+}
+
+.btn-profile-edit {
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-profile-edit:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--gold-300);
+}
+
+/* Chat stream */
+.chat-stream-container {
+  flex: 1;
+  padding: 0.85rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: rgba(11, 14, 23, 0.7);
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+  animation: fadeInPanel 0.2s ease;
+}
+
+.chat-msg.msg-me {
+  align-self: flex-end;
+}
+
+.chat-msg.msg-other {
+  align-self: flex-start;
+}
+
+.chat-msg.system-msg {
+  align-self: center;
+  max-width: 95%;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  color: var(--gold-400);
+  text-align: center;
+}
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+  font-size: 0.7rem;
+}
+
+.msg-me .msg-header {
+  justify-content: flex-end;
+}
+
+.msg-sender {
+  font-weight: 700;
+  color: var(--gold-300);
+}
+
+.msg-robe {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.msg-time {
+  font-size: 0.62rem;
+  color: #64748b;
+}
+
+.msg-bubble {
+  padding: 0.55rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.msg-me .msg-bubble {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  border-bottom-right-radius: 2px;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.msg-other .msg-bubble {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-bottom-left-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Quick Prayer Chips */
+.quick-prayer-chips {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.quick-prayer-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.qp-chip {
+  padding: 0.3rem 0.65rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qp-chip:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: var(--border-gold);
+  color: var(--gold-300);
+}
+
+.qp-chip:active {
+  transform: scale(0.95);
+}
+
+/* Chat Input Row */
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.chat-input-field {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.84rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.chat-input-field:focus {
+  border-color: var(--gold-500);
+}
+
+.btn-chat-send {
+  padding: 0.6rem 1.1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold-500), #b45309);
+  border: none;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-chat-send:active {
+  transform: scale(0.95);
+}
+
+@keyframes popInBubble {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Breakpoint cho 3D Temple */
+@media (max-width: 900px) {
+  .temple3d-main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .temple3d-canvas-wrapper {
+    height: 350px;
+  }
+
+  .temple-chat-card {
+    height: 480px;
+  }
+}
+
+@media (max-width: 600px) {
+  .temple3d-canvas-wrapper {
+    height: 290px;
+  }
+
+  .avatar-action-toolbar {
+    padding: 0.5rem;
+    gap: 0.35rem;
+  }
+
+  .btn-avatar-action {
+    font-size: 0.72rem;
+    padding: 0.45rem 0.55rem;
+  }
+}
