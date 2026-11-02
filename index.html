@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CHÙA ONLINE 4.0 | Tịnh Tâm Tích Đức & Tu Tại Gia</title>
+  <meta name="description" content="Chùa Online 4.0 - Không gian tu tập thanh tịnh tại gia. Gõ mõ tích đức, thắp nhang cầu an, thỉnh chuông bát nhã, xin xăm Quán Âm, thả cá phóng sinh online.">
+  <meta name="theme-color" content="#0d0f17">
+  
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans & Playfair Display cho nét tâm linh truyền thống sang trọng -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- 1. MÀN HÌNH KHÓA TÂM LINH BẢO MẬT (SECURITY PASSCODE GATE) -->
+  <!-- ========================================================================= -->
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-backdrop"></div>
+    <div class="lock-content">
+      <div class="lock-emblem">
+        <div class="lotus-halo"></div>
+        <div class="lock-icon">🪷</div>
+      </div>
+      
+      <h1 class="lock-title">THIỀN MÔN TÂM TỊNH</h1>
+      <p class="lock-subtitle">Cổng Chùa Online 4.0 • Không Gian Tu Tập & Tích Lũy Công Đức</p>
+      
+      <div class="lock-box">
+        <div class="lock-box-header">
+          <span class="lock-status-dot"></span>
+          <span>Mật Ngữ Bảo Mật</span>
+        </div>
+
+        <!-- Màn hình hiển thị 4 chấm PIN -->
+        <div class="pin-display" id="pinDisplay">
+          <span class="pin-dot" id="dot0"></span>
+          <span class="pin-dot" id="dot1"></span>
+          <span class="pin-dot" id="dot2"></span>
+          <span class="pin-dot" id="dot3"></span>
+        </div>
+
+        <div id="lockErrorMsg" class="lock-error-msg"></div>
+
+        <!-- Bàn phím số PIN Pad mượt mà -->
+        <div class="pin-pad">
+          <button class="pin-btn" onclick="pressKey('1')">1</button>
+          <button class="pin-btn" onclick="pressKey('2')">2</button>
+          <button class="pin-btn" onclick="pressKey('3')">3</button>
+          <button class="pin-btn" onclick="pressKey('4')">4</button>
+          <button class="pin-btn" onclick="pressKey('5')">5</button>
+          <button class="pin-btn" onclick="pressKey('6')">6</button>
+          <button class="pin-btn" onclick="pressKey('7')">7</button>
+          <button class="pin-btn" onclick="pressKey('8')">8</button>
+          <button class="pin-btn" onclick="pressKey('9')">9</button>
+          <button class="pin-btn pin-btn-clear" onclick="clearPin()">Xóa</button>
+          <button class="pin-btn" onclick="pressKey('0')">0</button>
+          <button class="pin-btn pin-btn-back" onclick="backspacePin()">⌫</button>
+        </div>
+
+        <div class="lock-actions">
+          <button class="btn-quick-unlock" onclick="quickUnlock()">
+            🔑 Mở Khóa Nhanh (Mật mã: 1234)
+          </button>
+          
+          <label class="remember-session">
+            <input type="checkbox" id="rememberSessionCheck" checked>
+            <span>Ghi nhớ phiên đăng nhập trên thiết bị này</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="lock-footer">
+        "Tâm an vạn sự an • Giữ tâm thanh tịnh giữa cuộc sống xô bồ"
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. KHÔNG GIAN CHÍNH: CHÙA ONLINE 4.0 -->
+  <!-- ========================================================================= -->
+  <div id="mainApp" class="main-app hidden">
+    
+    <!-- HEADER THANH TỊNH -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="temple-logo" onclick="switchTab('moyu')">
+          <span class="logo-lotus">🪷</span>
+        </div>
+        <div class="temple-titles">
+          <div class="temple-name-row">
+            <h1 class="temple-name">CHÙA ONLINE 4.0</h1>
+            <span class="temple-badge">TẠI GIA</span>
+          </div>
+          <p class="temple-tagline">Tịnh Tâm Tích Đức • Tiêu Trừ Muộn Phiền</p>
+        </div>
+      </div>
+
+      <!-- Khung thông tin Công đức & Cấp bậc -->
+      <div class="header-right">
+        <div class="merit-pill" onclick="switchTab('ledger')" title="Xem sổ tích lũy công đức">
+          <span class="merit-icon">✨</span>
+          <div class="merit-info">
+            <span class="merit-label">Tổng Công Đức</span>
+            <span class="merit-val" id="headerMeritVal">0</span>
+          </div>
+        </div>
+
+        <div class="level-pill" onclick="switchTab('ledger')" title="Cấp bậc tu tập">
+          <span class="level-badge" id="headerLevelBadge">Lv.1</span>
+          <span class="level-title" id="headerLevelTitle">Thiện Nam Tín Nữ</span>
+        </div>
+
+        <!-- Nút tiện ích: Nhạc thiền, Cài đặt, Khóa -->
+        <div class="header-actions">
+          <button class="icon-action-btn" id="btnZenMusic" onclick="toggleZenMusic()" title="Bật/Tắt Nhạc Thiền Tịnh Tâm">
+            <span id="zenMusicIcon">🎵</span>
+          </button>
+          <button class="icon-action-btn" onclick="openSettingsModal()" title="Cài đặt & Đổi mật mã">
+            ⚙️
+          </button>
+          <button class="icon-action-btn btn-lock-now" onclick="lockTempleNow()" title="Khóa chùa bảo mật ngay">
+            🔒
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- THANH ĐIỀU HƯỚNG TÁC VỤ TU TẬP (NAV TABS) -->
+    <nav class="nav-scroll-wrapper">
+      <div class="nav-bar">
+        <button class="nav-btn active" data-tab="moyu" onclick="switchTab('moyu')">
+          <span class="nav-emoji">🪵</span>
+          <span class="nav-text">Gõ Mõ</span>
+        </button>
+        <button class="nav-btn" data-tab="incense" onclick="switchTab('incense')">
+          <span class="nav-emoji">🕯️</span>
+          <span class="nav-text">Dâng Hương</span>
+        </button>
+        <button class="nav-btn" data-tab="bell" onclick="switchTab('bell')">
+          <span class="nav-emoji">🔔</span>
+          <span class="nav-text">Thỉnh Chuông</span>
+        </button>
+        <button class="nav-btn" data-tab="divination" onclick="switchTab('divination')">
+          <span class="nav-emoji">📜</span>
+          <span class="nav-text">Xin Xăm</span>
+        </button>
+        <button class="nav-btn" data-tab="pond" onclick="switchTab('pond')">
+          <span class="nav-emoji">🐟</span>
+          <span class="nav-text">Phóng Sinh</span>
+        </button>
+        <button class="nav-btn" data-tab="offering" onclick="switchTab('offering')">
+          <span class="nav-emoji">🌸</span>
+          <span class="nav-text">Dâng Lễ</span>
+        </button>
+        <button class="nav-btn" data-tab="ledger" onclick="switchTab('ledger')">
+          <span class="nav-emoji">📒</span>
+          <span class="nav-text">Sổ Công Đức</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- KHÔNG GIAN NỘI DUNG TỪNG PHÂN HỆ -->
+    <main class="app-body">
+
+      <!-- ============================================================== -->
+      <!-- TAB 1: GÕ MÕ TỤNG KINH (VIRTUAL MUYU - GÕ MÕ TÍCH ĐỨC) -->
+      <!-- ============================================================== -->
+      <section id="tab-moyu" class="tab-panel active">
+        <div class="moyu-container">
+          <!-- Hào quang Phật pháp -->
+          <div class="buddha-aura" id="buddhaAura"></div>
+
+          <!-- Khu vực hiển thị Chữ bay lên khi gõ mõ -->
+          <div class="floating-text-container" id="floatingContainer"></div>
+
+          <!-- Mõ gỗ 3D tương tác -->
+          <div class="moyu-wrapper" id="moyuWrapper" onclick="tapMoyu(event)">
+            <!-- SVG Mõ Gỗ Điêu Khắc Tinh Xảo -->
+            <svg class="moyu-svg" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="moyuWood" cx="45%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#9a3412" />
+                  <stop offset="45%" stop-color="#7c2d12" />
+                  <stop offset="85%" stop-color="#451a03" />
+                  <stop offset="100%" stop-color="#1c0a00" />
+                </radialGradient>
+                <linearGradient id="goldCarve" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#fef08a" />
+                  <stop offset="50%" stop-color="#f59e0b" />
+                  <stop offset="100%" stop-color="#b45309" />
+                </linearGradient>
+                <filter id="moyuGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#ea580c" flood-opacity="0.35"/>
+                </filter>
+              </defs>
+
+              <!-- Thân Mõ Gỗ Vỏ Sò Hoàng Gia -->
+              <path d="M160 20 C70 20 20 80 20 160 C20 230 75 260 160 260 C245 260 300 230 300 160 C300 80 250 20 160 20 Z" 
+                    fill="url(#moyuWood)" filter="url(#moyuGlow)" stroke="#f59e0b" stroke-width="3"/>
+              
+              <!-- Miệng Mõ & Khe Âm Thanh -->
+              <path d="M60 165 C85 140 235 140 260 165 C235 185 85 185 60 165 Z" 
+                    fill="#1e0a02" stroke="#d97706" stroke-width="2.5"/>
+              
+              <!-- Vảy Rồng & Hoa Văn Chạm Khắc -->
+              <circle cx="95" cy="115" r="14" fill="none" stroke="url(#goldCarve)" stroke-width="2.5"/>
+              <circle cx="225" cy="115" r="14" fill="none" stroke="url(#goldCarve)" stroke-width="2.5"/>
+              
+              <!-- Chữ Vạn / Hoa Sen Trung Tâm -->
+              <g transform="translate(142, 85) scale(0.9)">
+                <path d="M18 0 L22 0 L22 18 L40 18 L40 22 L22 22 L22 40 L18 40 L18 22 L0 22 L0 18 L18 18 Z" fill="url(#goldCarve)"/>
+                <path d="M22 0 L22 8 L30 8" stroke="url(#goldCarve)" stroke-width="3" fill="none"/>
+                <path d="M40 22 L32 22 L32 30" stroke="url(#goldCarve)" stroke-width="3" fill="none"/>
+                <path d="M18 40 L18 32 L10 32" stroke="url(#goldCarve)" stroke-width="3" fill="none"/>
+                <path d="M0 18 L8 18 L8 10" stroke="url(#goldCarve)" stroke-width="3" fill="none"/>
+              </g>
+
+              <!-- Mũi gõ / Đệm đế mõ -->
+              <path d="M90 250 C125 270 195 270 230 250" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Dùi gõ mõ tương tác -->
+            <div class="moyu-mallet" id="moyuMallet">🪵</div>
+          </div>
+
+          <div class="moyu-tap-hint">
+            <span>Chạm vào Mõ để tích công đức</span>
+            <span class="moyu-keyboard-shortcut">(hoặc nhấn phím Space trên máy tính)</span>
+          </div>
+
+          <!-- Bảng số liệu thống kê nhanh trong ngày -->
+          <div class="moyu-stats-card">
+            <div class="stat-item">
+              <span class="stat-number" id="todayMeritVal">0</span>
+              <span class="stat-desc">Công Đức Hôm Nay</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-number" id="todayTapsVal">0</span>
+              <span class="stat-desc">Tiếng Mõ Đã Gõ</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-number" id="streakDaysVal">1</span>
+              <span class="stat-desc">Ngày Tinh Tấn</span>
+            </div>
+          </div>
+
+          <!-- BỘ ĐIỀU KHIỂN TỰ ĐỘNG GÕ MÕ (AUTO TAP) -->
+          <div class="auto-tap-panel">
+            <div class="auto-tap-top">
+              <div class="auto-tap-label">
+                <span class="auto-dot" id="autoStatusDot"></span>
+                <strong>Gõ Mõ Tự Động (Tụng Niệm)</strong>
+              </div>
+              <button class="btn-toggle-auto" id="btnToggleAuto" onclick="toggleAutoTap()">
+                ▶ Bắt Đầu Gõ
+              </button>
+            </div>
+
+            <!-- Tùy chỉnh tốc độ BPM -->
+            <div class="speed-slider-row">
+              <span class="speed-label">Tốc độ: <strong id="speedDisplay">60 lần/phút (Tịnh tâm)</strong></span>
+              <input type="range" id="autoSpeedRange" min="30" max="180" value="60" step="10" oninput="changeAutoSpeed(this.value)">
+              <div class="speed-ticks">
+                <span onclick="setBpm(60)">Tịnh tâm (60)</span>
+                <span onclick="setBpm(108)">108 Hạt Chuỗi</span>
+                <span onclick="setBpm(150)">Siêu Tốc (150)</span>
+              </div>
+            </div>
+
+            <!-- Tùy chỉnh danh sách câu niệm bay lên -->
+            <div class="quote-selector-row">
+              <span>Lời Niệm Hiển Thị:</span>
+              <select id="blessingSelect" onchange="changeBlessingTheme(this.value)">
+                <option value="all">✨ Hỗn Hợp (Công đức, Bình an, Hạnh phúc)</option>
+                <option value="merit">🪙 +1 Công Đức / +1 Phúc Lành</option>
+                <option value="zen">🧘 Thiền Định (Tâm Tĩnh, An Nhiên, Vô Lượng)</option>
+                <option value="buddha">📿 Nam Mô A Di Đà Phật / Nam Mô Quan Thế Âm</option>
+                <option value="wealth">💰 Cầu Tài Lộc (Vạn Sự Hanh Thông, Phát Tài)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2: THẮP NHANG / DÂNG HƯƠNG QUÁN ÂM (VIRTUAL INCENSE) -->
+      <!-- ============================================================== -->
+      <section id="tab-incense" class="tab-panel">
+        <div class="incense-container">
+          <div class="panel-header-badge">
+            <h2>🕯️ Dâng Hương & Khấn Nguyện Tại Gia</h2>
+            <p>Thành tâm thắp 3 nén tâm hương dâng lên Tam Bảo cầu an lành</p>
+          </div>
+
+          <!-- Lư hương đồng & khói nhang canvas sống động -->
+          <div class="incense-altar">
+            <div class="buddha-statue">
+              <div class="halo-glow"></div>
+              <div class="statue-symbol">🙏</div>
+              <div class="buddha-name">NAM MÔ ĐẠI BI QUÁN THẾ ÂM BỒ TÁT</div>
+            </div>
+
+            <!-- Khung vẽ khói nhang mờ ảo -->
+            <canvas id="smokeCanvas" class="smoke-canvas" width="300" height="220"></canvas>
+
+            <!-- Lư hương & 3 nén nhang -->
+            <div class="incense-burner-box">
+              <div class="incense-sticks" id="incenseSticks">
+                <div class="stick-wrapper stick-1">
+                  <div class="ember" id="ember1"></div>
+                  <div class="stick-body" id="stickBody1"></div>
+                </div>
+                <div class="stick-wrapper stick-2">
+                  <div class="ember" id="ember2"></div>
+                  <div class="stick-body" id="stickBody2"></div>
+                </div>
+                <div class="stick-wrapper stick-3">
+                  <div class="ember" id="ember3"></div>
+                  <div class="stick-body" id="stickBody3"></div>
+                </div>
+              </div>
+
+              <!-- Lư hương đồng hoàng gia -->
+              <div class="brass-burner">
+                <div class="burner-rim"></div>
+                <div class="burner-body">
+                  <span class="burner-lotus">🪷</span>
+                </div>
+                <div class="burner-legs">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Đồng hồ thời gian nhang cháy -->
+            <div class="incense-timer-badge" id="incenseTimerBadge">
+              <span id="incenseStatusText">Hương chưa thắp</span>
+              <strong id="incenseCountdown">--:--</strong>
+            </div>
+          </div>
+
+          <!-- SỚ KHẤN NGUYỆN CẦU AN -->
+          <div class="prayer-box">
+            <h3 class="prayer-box-title">📜 Sớ Khấn Cầu An & Hóa Giải Muộn Phiền</h3>
+            <div class="prayer-form">
+              <div class="form-row-2">
+                <input type="text" id="prayerName" class="form-input" placeholder="Họ và tên tín chủ (VD: Nguyễn Văn An)...">
+                <input type="text" id="prayerYear" class="form-input" placeholder="Năm sinh (VD: Giáp Thân 2004)...">
+              </div>
+              <textarea id="prayerWish" class="form-textarea" placeholder="Nhập tâm nguyện khấn cầu (VD: Cầu mong gia đạo bình an, công việc hanh thông, tai qua nạn khỏi, tài lộc dồi dào, tâm tính an nhiên...)" rows="3"></textarea>
+              
+              <div class="incense-duration-select">
+                <span>Thời gian thắp hương:</span>
+                <div class="duration-radios">
+                  <label><input type="radio" name="incenseDuration" value="300" checked> 5 Phút</label>
+                  <label><input type="radio" name="incenseDuration" value="900"> 15 Phút</label>
+                  <label><input type="radio" name="incenseDuration" value="1800"> 30 Phút</label>
+                </div>
+              </div>
+
+              <button class="btn-light-incense" id="btnLightIncense" onclick="lightIncense()">
+                🔥 Thành Tâm Thắp Nhang & Gửi Nguyện Ước
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: THỈNH ĐẠI HỒNG CHUNG (TEMPLE BELL / CHUÔNG BÁT NHÃ) -->
+      <!-- ============================================================== -->
+      <section id="tab-bell" class="tab-panel">
+        <div class="bell-container">
+          <div class="panel-header-badge">
+            <h2>🔔 Thỉnh Đại Hồng Chung Bát Nhã</h2>
+            <p>"Tiếng chuông ngân vang, phiền não nhẹ tan, bồ đề tâm mở rộng"</p>
+          </div>
+
+          <div class="bell-stage" onclick="tollBell()">
+            <!-- Sóng âm lan tỏa hình tròn khi thỉnh chuông -->
+            <div class="sound-wave-circle" id="bellWave1"></div>
+            <div class="sound-wave-circle" id="bellWave2"></div>
+            <div class="sound-wave-circle" id="bellWave3"></div>
+
+            <!-- Đại Hồng Chung Cổ Điển -->
+            <div class="temple-bell-visual" id="bellVisual">
+              <div class="bell-hanger"></div>
+              <div class="bell-crown"></div>
+              <div class="bell-body">
+                <div class="bell-inscription">
+                  <span>般若波羅蜜多</span>
+                  <div class="bell-lotus-relief">🪷</div>
+                  <span>BÁT NHÃ TÂM KINH</span>
+                </div>
+              </div>
+              <div class="bell-rim"></div>
+            </div>
+
+            <!-- Vồ gỗ gõ chuông -->
+            <div class="bell-striker" id="bellStriker"></div>
+          </div>
+
+          <div class="bell-hint">
+            <button class="btn-toll-bell" onclick="tollBell()">
+              🪵 Thỉnh Chuông (+10 Công Đức)
+            </button>
+            <p>Mỗi tiếng chuông ngân sâu lắng 6 giây giúp thanh lọc tâm trí, giải tỏa stress</p>
+          </div>
+
+          <!-- Kệ thỉnh chuông truyền thống -->
+          <div class="bell-prayer-poem">
+            <div class="poem-title">KỆ THỈNH CHUÔNG</div>
+            <p>
+              Nguyện tiếng chuông này vang pháp giới,<br>
+              Xa xôi tăm tối cũng nghe thông.<br>
+              Phiền não nhẹ tan, tâm thanh tịnh,<br>
+              Bồ đề tâm mở, thoát mê lầm.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 4: XIN XĂM / BỐC QUẺ QUÁN ÂM (FORTUNE DIVINATION STICKS) -->
+      <!-- ============================================================== -->
+      <section id="tab-divination" class="tab-panel">
+        <div class="divination-container">
+          <div class="panel-header-badge">
+            <h2>📜 Xin Xăm & Bốc Quẻ Linh Ứng Đầu Ngày</h2>
+            <p>Tâm thành tất ứng • Chiêm nghiệm vận thế, công danh, tài lộc và gia đạo</p>
+          </div>
+
+          <!-- Hộp xăm tre tương tác -->
+          <div class="fortune-box-stage">
+            <div class="fortune-bamboo-pot" id="bambooPot" onclick="shakeSticks()">
+              <div class="bamboo-rim"></div>
+              <div class="bamboo-body">
+                <span class="bamboo-seal">靈籤</span>
+                <span class="bamboo-text">QUAN ÂM LINH XĂM</span>
+              </div>
+              <div class="bamboo-sticks-cluster" id="sticksCluster">
+                <div class="bamboo-stick bs-1"></div>
+                <div class="bamboo-stick bs-2"></div>
+                <div class="bamboo-stick bs-3"></div>
+                <div class="bamboo-stick bs-4"></div>
+                <div class="bamboo-stick bs-5"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="shake-action-area">
+            <button class="btn-shake-sticks" id="btnShakeSticks" onclick="shakeSticks()">
+              🎲 Thành Tâm Lắc Ống Xăm
+            </button>
+            <p class="shake-sub">Hít sâu một hơi, tập trung nghĩ về việc cần thấu tỏ và bấm lắc xăm</p>
+          </div>
+
+          <!-- MÀN HÌNH HIỂN THỊ KẾT QUẢ QUẺ XĂM LINH ỨNG -->
+          <div class="fortune-result-card hidden" id="fortuneResultCard">
+            <div class="fortune-card-banner">
+              <span class="fortune-rank-pill" id="cardRankPill">THƯỢNG THƯỢNG (ĐẠI CÁT)</span>
+              <h3 class="fortune-number-title" id="cardNumberTitle">QUẺ SỐ 01</h3>
+            </div>
+
+            <div class="fortune-poem-section">
+              <div class="poem-header">BÀI THƠ QUẺ</div>
+              <p class="poem-body" id="cardPoemBody">
+                Vận hội rồng mây gặp tiết xuân,<br>
+                Công danh sáng tỏ phúc muôn phần.<br>
+                Cầu tài được lộc nhà vui vẻ,<br>
+                Phước đức vun bồi vạn sự hưng.
+              </p>
+            </div>
+
+            <!-- Luận giải 6 phương diện đời sống -->
+            <div class="fortune-grid-details">
+              <div class="detail-box">
+                <div class="detail-title">💼 Công Danh & Sự Nghiệp</div>
+                <p id="detCareer">Cơ hội thăng tiến mở rộng, được quý nhân phù trợ, kinh doanh phát đạt.</p>
+              </div>
+              <div class="detail-box">
+                <div class="detail-title">💰 Tài Lộc & Tiền Bạc</div>
+                <p id="detWealth">Tài lộc hanh thông, thu nhập ổn định, đầu tư có lợi nhuận xứng đáng.</p>
+              </div>
+              <div class="detail-box">
+                <div class="detail-title">🏡 Gia Đạo & Bình An</div>
+                <p id="detFamily">Gia đình thuận hòa, trên kính dưới nhường, có tin vui về con cái hoặc nhà cửa.</p>
+              </div>
+              <div class="detail-box">
+                <div class="detail-title">❤️ Tình Duyên & Hôn Nhân</div>
+                <p id="detLove">Người độc thân sớm gặp lương duyên, người có đôi càng thêm thấu hiểu, gắn bó.</p>
+              </div>
+              <div class="detail-box">
+                <div class="detail-title">🧘 Sức Khỏe & Tinh Thần</div>
+                <p id="detHealth">Thân tâm an lạc, bệnh cũ thuyên giảm, nên duy trì lối sống lành mạnh.</p>
+              </div>
+              <div class="detail-box">
+                <div class="detail-title">🚀 Xuất Hành & Mưu Sự</div>
+                <p id="detTravel">Đi xa gặp may mắn, ký kết hợp đồng thuận lợi, hướng Đông và Nam đại cát.</p>
+              </div>
+            </div>
+
+            <!-- Lời khuyên tu tâm -->
+            <div class="fortune-advice-box">
+              <strong>💡 Lời Khuyên Tu Tâm:</strong>
+              <span id="cardAdviceText">Dẫu gặp quẻ tốt cũng không sinh tâm tự mãn, năng làm việc thiện, ăn ở có đức thì phước lành mới bền lâu.</span>
+            </div>
+
+            <div class="fortune-footer-buttons">
+              <button class="btn-save-fortune" onclick="saveFortuneToHistory()">
+                ⭐ Lưu Quẻ Vào Sổ Nhật Ký
+              </button>
+              <button class="btn-reshake" onclick="resetFortune()">
+                🔄 Xin Quẻ Khác
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 5: HỒ SEN PHÓNG SINH (VIRTUAL LOTUS POND & FISH RELEASING) -->
+      <!-- ============================================================== -->
+      <section id="tab-pond" class="tab-panel">
+        <div class="pond-container">
+          <div class="panel-header-badge">
+            <h2>🐟 Hồ Sen Phóng Sinh Tích Phước</h2>
+            <p>"Phóng sinh giải nghiệp oán • Tăng phước đức diên thọ, vạn sự hanh thông"</p>
+          </div>
+
+          <!-- Canvas Hồ Sen tương tác với đàn cá bơi lội -->
+          <div class="pond-canvas-wrapper">
+            <canvas id="pondCanvas" class="pond-canvas"></canvas>
+            <div class="pond-overlay-info">
+              <span>Đàn cá hiện tại: <strong id="fishCountDisplay">8</strong> chú cá Koi</span>
+              <span>Hoa đăng trên hồ: <strong id="lanternCountDisplay">3</strong> chiếc</span>
+            </div>
+          </div>
+
+          <!-- Nút hành động phóng sinh -->
+          <div class="pond-action-controls">
+            <button class="btn-pond-action btn-release-fish" onclick="releaseFish()">
+              🐟 Phóng Sinh 1 Cá Chép (+20 Công Đức)
+            </button>
+            <button class="btn-pond-action btn-float-lantern" onclick="floatLantern()">
+              🪷 Thả Hoa Đăng Cầu Nguyện (+30 Công Đức)
+            </button>
+          </div>
+
+          <div class="pond-zen-quote">
+            "Muôn loài chúng sinh đều quý trọng sinh mạng như ta. Giữ lòng từ bi cứu giúp muôn loài là gieo hạt giống bình an cho mai sau."
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 6: DÂNG LỄ CÚNG DƯỜNG (VIRTUAL OFFERINGS) -->
+      <!-- ============================================================== -->
+      <section id="tab-offering" class="tab-panel">
+        <div class="offering-container">
+          <div class="panel-header-badge">
+            <h2>🌸 Dâng Lễ Cúng Dường Tam Bảo</h2>
+            <p>Dâng hoa thơm quả ngọt, nước tịnh tâm thành kính hướng về cội nguồn</p>
+          </div>
+
+          <!-- Khung bàn thờ dâng lễ -->
+          <div class="offering-altar-view">
+            <div class="altar-backdrop-glow"></div>
+            <div class="altar-table">
+              <div class="offering-slot" id="slotFruit">
+                <div class="slot-item-icon">🥭</div>
+                <span class="slot-item-label">Mâm Ngũ Quả</span>
+              </div>
+              <div class="offering-slot" id="slotFlower">
+                <div class="slot-item-icon">🪷</div>
+                <span class="slot-item-label">Bình Hoa Sen</span>
+              </div>
+              <div class="offering-slot" id="slotWater">
+                <div class="slot-item-icon">🍵</div>
+                <span class="slot-item-label">Chén Nước Tịnh</span>
+              </div>
+              <div class="offering-slot" id="slotCandle">
+                <div class="slot-item-icon">🕯️</div>
+                <span class="slot-item-label">Đèn Nến Hoa Sen</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danh sách các lễ phẩm có thể dâng -->
+          <div class="offering-selection-grid">
+            <div class="offering-card" onclick="offerItem('fruit')">
+              <div class="oc-icon">🍇</div>
+              <div class="oc-title">Dâng Mâm Ngũ Quả</div>
+              <div class="oc-desc">Cầu mong ngũ phúc lâm môn, mùa màng bội thu</div>
+              <button class="oc-btn">+50 Công Đức</button>
+            </div>
+
+            <div class="offering-card" onclick="offerItem('flower')">
+              <div class="oc-icon">🌸</div>
+              <div class="oc-title">Dâng Hoa Sen Tươi</div>
+              <div class="oc-desc">Sắc hương thanh khiết, trang nghiêm đạo tràng</div>
+              <button class="oc-btn">+50 Công Đức</button>
+            </div>
+
+            <div class="offering-card" onclick="offerItem('water')">
+              <div class="oc-icon">💧</div>
+              <div class="oc-title">Dâng Chén Nước Cam Lồ</div>
+              <div class="oc-desc">Tâm thanh tịnh như nước, rửa sạch bụi trần</div>
+              <button class="oc-btn">+30 Công Đức</button>
+            </div>
+
+            <div class="offering-card" onclick="offerItem('candle')">
+              <div class="oc-icon">🪔</div>
+              <div class="oc-title">Thắp Nến Tuệ Đăng</div>
+              <div class="oc-desc">Ánh sáng trí tuệ soi đường, xua tan u tối vô minh</div>
+              <button class="oc-btn">+40 Công Đức</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 7: SỔ CÔNG ĐỨC & CẤP BẬC (MERIT LEDGER & LEVELS) -->
+      <!-- ============================================================== -->
+      <section id="tab-ledger" class="tab-panel">
+        <div class="ledger-container">
+          <div class="panel-header-badge">
+            <h2>📒 Sổ Tích Lũy Công Đức & Tu Tập</h2>
+            <p>Ghi nhận hành trình tinh tấn hàng ngày trên con đường an lạc</p>
+          </div>
+
+          <!-- Thẻ cấp bậc tu tập lớn -->
+          <div class="level-master-card">
+            <div class="lmc-header">
+              <div class="lmc-avatar">🪷</div>
+              <div class="lmc-info">
+                <span class="lmc-sub">Cấp bậc tu tập hiện tại</span>
+                <h3 class="lmc-rank-name" id="ledgerRankName">Thiện Nam Tín Nữ</h3>
+              </div>
+              <span class="lmc-badge-pill" id="ledgerRankBadge">Cấp 1</span>
+            </div>
+
+            <!-- Thanh tiến trình cấp bậc -->
+            <div class="exp-bar-wrapper">
+              <div class="exp-bar-fill" id="ledgerExpFill" style="width: 15%;"></div>
+            </div>
+            <div class="exp-labels">
+              <span id="expCurrentText">150 / 500 Công đức</span>
+              <span id="expNextRank">Tiếp theo: Phật Tử Tinh Tấn</span>
+            </div>
+          </div>
+
+          <!-- Bảng tổng kết 6 chỉ số công đức -->
+          <div class="stats-matrix-grid">
+            <div class="stat-matrix-box">
+              <span class="smb-icon">🪵</span>
+              <div class="smb-val" id="statTotalTaps">0</div>
+              <div class="smb-label">Tiếng Mõ Đã Gõ</div>
+            </div>
+
+            <div class="stat-matrix-box">
+              <span class="smb-icon">🕯️</span>
+              <div class="smb-val" id="statTotalIncense">0</div>
+              <div class="smb-label">Nén Hương Đã Thắp</div>
+            </div>
+
+            <div class="stat-matrix-box">
+              <span class="smb-icon">🔔</span>
+              <div class="smb-val" id="statTotalBells">0</div>
+              <div class="smb-label">Hồi Chuông Đã Thỉnh</div>
+            </div>
+
+            <div class="stat-matrix-box">
+              <span class="smb-icon">📜</span>
+              <div class="smb-val" id="statTotalFortunes">0</div>
+              <div class="smb-label">Quẻ Xăm Đã Chiêm</div>
+            </div>
+
+            <div class="stat-matrix-box">
+              <span class="smb-icon">🐟</span>
+              <div class="smb-val" id="statTotalFishes">0</div>
+              <div class="smb-label">Sinh Linh Phóng Sinh</div>
+            </div>
+
+            <div class="stat-matrix-box">
+              <span class="smb-icon">🪷</span>
+              <div class="smb-val" id="statTotalLanterns">0</div>
+              <div class="smb-label">Hoa Đăng Đã Thả</div>
+            </div>
+          </div>
+
+          <!-- Lịch sử các quẻ xăm đã lưu -->
+          <div class="saved-fortunes-list">
+            <h4 class="sfl-title">📜 Nhật Ký Quẻ Xăm Đã Chiêm Nghiệm</h4>
+            <div id="savedFortunesContainer" class="sfl-container">
+              <p class="empty-list-text">Chưa có quẻ xăm nào được lưu. Hãy sang tab "Xin Xăm" để chiêm nghiệm nhé!</p>
+            </div>
+          </div>
+
+          <!-- Nút hành động: Chia sẻ & Đặt lại -->
+          <div class="ledger-actions-row">
+            <button class="btn-export-certificate" onclick="generateMeritCertificate()">
+              🏆 Xuất Chứng Nhận Công Đức (Chia Sẻ)
+            </button>
+            <button class="btn-clear-merit" onclick="confirmResetMerit()">
+              ⚠️ Đặt Lại Số Liệu
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER THANH TỊNH -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <p>🏛️ <strong>CHÙA ONLINE 4.0</strong> — Không gian tu tập số hóa tôn nghiêm & an lạc</p>
+        <p class="footer-sub">Thiết kế bởi <strong>Hermes Agent AI</strong> • 100% Hoạt động mượt mà trên iPhone, Android & PC</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL CÀI ĐẶT & ĐỔI MẬT MÃ BẢO MẬT -->
+  <!-- ========================================================================= -->
+  <div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⚙️ Cài Đặt Hệ Thống & Bảo Mật</h3>
+        <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Đổi mật mã bảo mật -->
+        <div class="setting-group">
+          <h4>🔒 Đổi Mật Mã Bảo Mật Chùa Online</h4>
+          <p class="setting-desc">Mật mã mặc định ban đầu là <strong>1234</strong>. Bạn có thể đổi sang mã PIN 4 số của riêng bạn.</p>
+          <div class="change-pin-form">
+            <input type="password" id="inputOldPin" class="form-input" maxlength="4" placeholder="Nhập mật mã hiện tại (VD: 1234)...">
+            <input type="password" id="inputNewPin" class="form-input" maxlength="4" placeholder="Nhập mật mã mới (4 số)...">
+            <input type="password" id="inputConfirmPin" class="form-input" maxlength="4" placeholder="Xác nhận mật mã mới...">
+            <button class="btn-save-pin" onclick="saveNewPasscode()">💾 Lưu Mật Mã Mới</button>
+            <div id="pinChangeNotice" class="pin-change-notice"></div>
+          </div>
+        </div>
+
+        <!-- Cài đặt Âm thanh -->
+        <div class="setting-group">
+          <h4>🔊 Cài Đặt Âm Thanh & Rung</h4>
+          <div class="setting-toggle-row">
+            <span>Tiếng Mõ & Chuông (Web Audio)</span>
+            <input type="checkbox" id="soundEffectCheck" checked onchange="toggleSoundEffects(this.checked)">
+          </div>
+          <div class="setting-toggle-row">
+            <span>Rung Haptic trên điện thoại khi gõ</span>
+            <input type="checkbox" id="hapticCheck" checked onchange="toggleHaptic(this.checked)">
+          </div>
+          <div class="setting-toggle-row">
+            <span>Âm lượng tiếng mõ/chuông:</span>
+            <input type="range" id="volumeRange" min="0" max="100" value="80" oninput="changeMasterVolume(this.value)">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script logic ứng dụng -->
+  <script src="app.js"></script>
+</body>
+</html>
