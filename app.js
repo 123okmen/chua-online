@@ -440,204 +440,6 @@ function triggerHaptic(duration) {
 }
 
 // =========================================================================
-// 4. MÀN HÌNH KHÓA TÂM LINH BẢO MẬT (CHỐNG TREO 100% - FAILSAFE PIN GATE)
-// =========================================================================
-let currentPinInput = "";
-
-function pressKey(num) {
-  if (currentPinInput.length < 4) {
-    currentPinInput += String(num);
-    updatePinDots();
-    try {
-      playMoyuSound();
-    } catch {}
-
-    if (currentPinInput.length === 4) {
-      setTimeout(verifyPin, 100);
-    }
-  }
-}
-
-function focusHiddenInput() {
-  const el = document.getElementById("hiddenPinInput");
-  if (el) {
-    el.focus();
-  }
-}
-
-function handleHiddenInput(val) {
-  val = String(val).replace(/[^0-9]/g, "").slice(0, 4);
-  currentPinInput = val;
-  updatePinDots();
-  if (val.length === 4) {
-    setTimeout(verifyPin, 100);
-  }
-}
-
-function clearPin() {
-  currentPinInput = "";
-  const hiddenInp = document.getElementById("hiddenPinInput");
-  if (hiddenInp) hiddenInp.value = "";
-  updatePinDots();
-  const errMsg = document.getElementById("lockErrorMsg");
-  if (errMsg) errMsg.textContent = "";
-}
-
-function backspacePin() {
-  if (currentPinInput.length > 0) {
-    currentPinInput = currentPinInput.slice(0, -1);
-    const hiddenInp = document.getElementById("hiddenPinInput");
-    if (hiddenInp) hiddenInp.value = currentPinInput;
-    updatePinDots();
-  }
-}
-
-function updatePinDots() {
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById(`dot${i}`);
-    if (dot) {
-      dot.classList.toggle("filled", i < currentPinInput.length);
-    }
-  }
-}
-
-function verifyPin() {
-  const errMsg = document.getElementById("lockErrorMsg");
-  const storedPin = DEFAULT_PIN; // Cố định 2002
-
-  // Chấp nhận mật mã 2002
-  if (currentPinInput === DEFAULT_PIN || currentPinInput === "2002") {
-    if (errMsg) {
-      errMsg.textContent = "✓ Mật mã 2002 chính xác! Đang mở cửa thiền môn...";
-      errMsg.style.color = "#34d399";
-    }
-    setTimeout(unlockAppDirectly, 100);
-  } else {
-    if (errMsg) {
-      errMsg.innerHTML = `Mật mã không đúng. Vui lòng nhập mật mã mặc định: <strong style="color:#facc15; font-size:1.1rem;">2002</strong>`;
-      errMsg.style.color = "#f87171";
-    }
-    triggerHaptic([50, 40, 50]);
-
-    const pinBox = document.getElementById("pinDisplay");
-    if (pinBox) {
-      pinBox.classList.add("shake-error");
-      setTimeout(() => {
-        pinBox.classList.remove("shake-error");
-        clearPin();
-      }, 400);
-    }
-  }
-}
-
-function quickUnlock() {
-  currentPinInput = "2002";
-  updatePinDots();
-  unlockAppDirectly();
-}
-
-function unlockAppDirectly() {
-  appState.unlocked = true;
-  try {
-    const remember = document.getElementById("rememberSessionCheck")?.checked;
-    if (remember) {
-      localStorage.setItem("chua_online_session_unlocked", "true");
-    }
-  } catch {}
-
-  const lockScreen = document.getElementById("lockScreen");
-  const mainApp = document.getElementById("mainApp");
-  if (lockScreen) lockScreen.classList.add("hidden");
-  if (mainApp) mainApp.classList.remove("hidden");
-
-  try {
-    playBellSound();
-  } catch {}
-
-  try {
-    updateUI();
-  } catch (e) {
-    console.warn("updateUI warning:", e);
-  }
-
-  try {
-    setTimeout(initSmokeCanvas, 100);
-  } catch {}
-
-  try {
-    setTimeout(initPondCanvas, 100);
-  } catch {}
-}
-
-function lockTempleNow() {
-  try {
-    stopAutoTap();
-    stopZenAmbient();
-  } catch {}
-  appState.unlocked = false;
-  localStorage.removeItem("chua_online_session_unlocked");
-  currentPinInput = "";
-  updatePinDots();
-  const errMsg = document.getElementById("lockErrorMsg");
-  if (errMsg) errMsg.textContent = "";
-
-  const lockScreen = document.getElementById("lockScreen");
-  const mainApp = document.getElementById("mainApp");
-  if (mainApp) mainApp.classList.add("hidden");
-  if (lockScreen) lockScreen.classList.remove("hidden");
-}
-
-function checkInitialLock() {
-  try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hash = window.location.hash;
-    if (urlParams.get("unlock") === "true" || urlParams.get("pass") || hash.includes("open") || hash.includes("unlock")) {
-      unlockAppDirectly();
-      return;
-    }
-
-    const isUnlockedSession = localStorage.getItem("chua_online_session_unlocked") === "true";
-    if (isUnlockedSession) {
-      unlockAppDirectly();
-    } else {
-      const lockScreen = document.getElementById("lockScreen");
-      const mainApp = document.getElementById("mainApp");
-      if (lockScreen) lockScreen.classList.remove("hidden");
-      if (mainApp) mainApp.classList.add("hidden");
-    }
-  } catch {
-    unlockAppDirectly();
-  }
-}
-
-// Bắt phím vật lý trên máy tính (Numpad, 0-9, Enter, Backspace, Esc)
-window.addEventListener("keydown", (e) => {
-  if (!appState.unlocked) {
-    if (e.key >= "0" && e.key <= "9") {
-      pressKey(e.key);
-    } else if (e.key === "Backspace") {
-      backspacePin();
-    } else if (e.key === "Enter") {
-      if (currentPinInput.length === 4) {
-        verifyPin();
-      } else {
-        unlockAppDirectly();
-      }
-    } else if (e.key === "Escape") {
-      clearPin();
-    }
-  } else {
-    if (e.code === "Space") {
-      const activeTab = document.querySelector(".tab-panel.active");
-      if (activeTab && activeTab.id === "tab-moyu") {
-        e.preventDefault();
-        tapMoyu();
-      }
-    }
-  }
-});
-
-// =========================================================================
 // 5. GÕ MÕ TỤNG KINH (VIRTUAL MUYU) & AUTO-TAP
 // =========================================================================
 let autoTapTimer = null;
@@ -1483,8 +1285,15 @@ function generateMeritCertificate() {
   win.document.write(`<title>Chứng Nhận Công Đức</title><body style="margin:0;background:#090b10;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${dataUrl}" style="max-width:90%;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.8);"/></body>`);
 }
 
-// Khởi động ứng dụng
+// Khởi động ứng dụng trực tiếp không qua mật mã
 window.addEventListener("DOMContentLoaded", () => {
   loadState();
-  checkInitialLock();
+  appState.unlocked = true;
+  updateUI();
+  try {
+    setTimeout(initSmokeCanvas, 100);
+  } catch {}
+  try {
+    setTimeout(initPondCanvas, 100);
+  } catch {}
 });

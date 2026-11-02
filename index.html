@@ -17,87 +17,9 @@
 <body>
 
   <!-- ========================================================================= -->
-  <!-- 1. MÀN HÌNH KHÓA TÂM LINH BẢO MẬT (SECURITY PASSCODE GATE) -->
-  <!-- ========================================================================= -->
-  <div id="lockScreen" class="lock-screen">
-    <div class="lock-backdrop"></div>
-    <div class="lock-content">
-      <div class="lock-emblem">
-        <div class="lotus-halo"></div>
-        <div class="lock-icon">🪷</div>
-      </div>
-      
-      <h1 class="lock-title">THIỀN MÔN TÂM TỊNH</h1>
-      <p class="lock-subtitle">Cổng Chùa Online 4.0 • Không Gian Tu Tập & Tích Lũy Công Đức</p>
-      
-      <div class="lock-box">
-        <div class="lock-box-header">
-          <span class="lock-status-dot"></span>
-          <span>Mật Ngữ Bảo Mật</span>
-        </div>
-
-        <!-- Thông báo mật mã mặc định rõ ràng -->
-        <div class="lock-default-hint" onclick="quickUnlock()">
-          💡 Mật mã vào chùa: <strong>2002</strong> <span class="tap-to-fill">(Chạm để điền & mở cửa ngay)</span>
-        </div>
-
-        <!-- Màn hình hiển thị 4 chấm PIN -->
-        <div class="pin-display" id="pinDisplay" onclick="focusHiddenInput()">
-          <span class="pin-dot" id="dot0"></span>
-          <span class="pin-dot" id="dot1"></span>
-          <span class="pin-dot" id="dot2"></span>
-          <span class="pin-dot" id="dot3"></span>
-        </div>
-
-        <!-- Input ẩn hỗ trợ bàn phím thật trên mobile & desktop -->
-        <input type="tel" id="hiddenPinInput" class="hidden-pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="handleHiddenInput(this.value)" autocomplete="off">
-
-        <div id="lockErrorMsg" class="lock-error-msg"></div>
-
-        <!-- Bàn phím số PIN Pad mượt mà -->
-        <div class="pin-pad">
-          <button type="button" class="pin-btn" onclick="pressKey('1')">1</button>
-          <button type="button" class="pin-btn" onclick="pressKey('2')">2</button>
-          <button type="button" class="pin-btn" onclick="pressKey('3')">3</button>
-          <button type="button" class="pin-btn" onclick="pressKey('4')">4</button>
-          <button type="button" class="pin-btn" onclick="pressKey('5')">5</button>
-          <button type="button" class="pin-btn" onclick="pressKey('6')">6</button>
-          <button type="button" class="pin-btn" onclick="pressKey('7')">7</button>
-          <button type="button" class="pin-btn" onclick="pressKey('8')">8</button>
-          <button type="button" class="pin-btn" onclick="pressKey('9')">9</button>
-          <button type="button" class="pin-btn pin-btn-clear" onclick="clearPin()">Xóa</button>
-          <button type="button" class="pin-btn" onclick="pressKey('0')">0</button>
-          <button type="button" class="pin-btn pin-btn-back" onclick="backspacePin()">⌫</button>
-        </div>
-
-        <div class="lock-actions">
-          <button type="button" class="btn-quick-unlock" onclick="quickUnlock()">
-            ⚡ Mở Khóa Nhanh (Mật mã: 2002)
-          </button>
-          
-          <button type="button" class="btn-direct-unlock" onclick="unlockAppDirectly()">
-            🚪 Vào Chùa Ngay (Không Cần Mật Mã)
-          </button>
-
-
-          
-          <label class="remember-session">
-            <input type="checkbox" id="rememberSessionCheck" checked>
-            <span>Ghi nhớ phiên đăng nhập trên máy này</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="lock-footer">
-        "Tâm an vạn sự an • Giữ tâm thanh tịnh giữa cuộc sống xô bồ"
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
   <!-- 2. KHÔNG GIAN CHÍNH: CHÙA ONLINE 4.0 -->
   <!-- ========================================================================= -->
-  <div id="mainApp" class="main-app hidden">
+  <div id="mainApp" class="main-app">
     
     <!-- HEADER THANH TỊNH -->
     <header class="app-header">
@@ -137,9 +59,7 @@
           <button class="icon-action-btn" onclick="openSettingsModal()" title="Cài đặt & Đổi mật mã">
             ⚙️
           </button>
-          <button class="icon-action-btn btn-lock-now" onclick="lockTempleNow()" title="Khóa chùa bảo mật ngay">
-            🔒
-          </button>
+
         </div>
       </div>
     </header>
@@ -747,21 +667,11 @@
   <div class="modal-overlay hidden" id="settingsModal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3>⚙️ Cài Đặt Hệ Thống & Bảo Mật</h3>
+        <h3>⚙️ Cài Đặt Hệ Thống</h3>
         <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
       </div>
 
       <div class="modal-body">
-        <!-- Thông tin bảo mật -->
-        <div class="setting-group">
-          <h4>🔒 Mật Mã Mở Khóa Chùa Online</h4>
-          <div style="background: rgba(245, 158, 11, 0.12); border: 1px dashed var(--gold-500); border-radius: 12px; padding: 0.85rem 1rem; text-align: center; margin-top: 0.5rem;">
-            <span style="font-size: 0.85rem; color: var(--text-secondary);">Mật mã bảo mật cố định là:</span>
-            <div style="font-size: 1.8rem; font-weight: 900; letter-spacing: 4px; color: var(--gold-400); margin: 0.3rem 0;">2002</div>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Sử dụng mã 2002 khi mở cửa thiền môn</span>
-          </div>
-        </div>
-
         <!-- Cài đặt Âm thanh -->
         <div class="setting-group">
           <h4>🔊 Cài Đặt Âm Thanh & Rung</h4>
