@@ -779,7 +779,7 @@
 
   <!-- ========================================================================= -->
   
-  <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC -->
+  <!-- MODAL XEM & TẢI CHỨNG NHẬN CÔNG ĐỨC (CANVAS TRỰC TIẾP CHỐNG LỖI ẢNH) -->
   <div class="modal-overlay hidden" id="certModal" onclick="closeCertModal(event)">
     <div class="cert-modal-dialog" onclick="event.stopPropagation()">
       <div class="cert-modal-header">
@@ -787,11 +787,14 @@
         <button type="button" class="modal-close" onclick="closeCertModal()">&times;</button>
       </div>
       <div class="cert-modal-body">
-        <img id="certImagePreview" class="cert-preview-img" alt="Chứng nhận công đức">
+        <div class="cert-canvas-frame">
+          <canvas id="certDirectCanvas" width="800" height="600" class="cert-display-canvas"></canvas>
+        </div>
+        <img id="certImagePreview" class="cert-preview-img hidden" alt="Chứng nhận công đức">
         <div class="cert-actions">
-          <a id="btnDownloadCert" class="btn-download-cert" download="Chung_Nhan_Cong_Duc_Chua_Online.png">
+          <button type="button" id="btnDownloadCertAction" class="btn-download-cert" onclick="downloadCertificateFile()">
             💾 Tải Ảnh Về Máy
-          </a>
+          </button>
           <button type="button" class="btn-close-cert" onclick="closeCertModal()">
             Đóng
           </button>

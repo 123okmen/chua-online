@@ -2574,3 +2574,21 @@ body {
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
+
+/* Khung bọc Canvas Chứng Nhận chống lỗi ảnh */
+.cert-canvas-frame {
+  width: 100%;
+  max-width: 620px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border-gold);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), var(--shadow-gold);
+  background: #1e130a;
+}
+
+.cert-display-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  display: block;
+}
