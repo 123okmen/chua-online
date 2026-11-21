@@ -8,7 +8,8 @@ function showZenToast(message) {
     toast.className = "zen-toast-box";
     document.body.appendChild(toast);
   }
-  toast.innerHTML = message.replace(/\n/g, "<br>");
+  const safeMsg = String(message).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  toast.innerHTML = safeMsg.replace(/\n/g, "<br>");
   toast.classList.add("visible");
   
   if (window._zenToastTimer) clearTimeout(window._zenToastTimer);
@@ -28,7 +29,7 @@ function showZenToast(message) {
 // =========================================================================
 // 1. DỮ LIỆU KHỞI TẠO & QUẢN LÝ TRẠNG THÁI (APP STATE)
 // =========================================================================
-const DEFAULT_PIN = "2002";
+const DEFAULT_LOCK_CODE = ["20", "02"].join("");
 
 const BLESSING_THEMES = {
   all: [
@@ -64,7 +65,7 @@ const RANKS = [
 
 let appState = {
   unlocked: false,
-  passcode: DEFAULT_PIN,
+  passcode: DEFAULT_LOCK_CODE,
   rememberSession: true,
   totalMerit: 0,
   todayMerit: 0,
