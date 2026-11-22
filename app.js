@@ -895,7 +895,7 @@ class KoiFish {
     this.vx = (Math.random() - 0.5) * 1.5;
     this.vy = (Math.random() - 0.5) * 1.5;
     this.size = 14 + Math.random() * 8;
-    this.color = Math.random() < 0.6 ? "#ea580c" : (Math.random() < 0.5 ? "#f59e0b" : "#dc2626");
+    this.color = Math.random() < 0.5 ? "#f59e0b" : "#d97706";
     this.angle = 0;
     this.tailOsc = Math.random() * Math.PI * 2;
   }
@@ -1404,3 +1404,19 @@ window.addEventListener("keydown", (e) => {
     if (typeof closeProfileModal === "function") closeProfileModal();
   }
 });
+
+/* === Scroll reveal: IntersectionObserver (600–800ms) === */
+(() => {
+  const preferred = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (!preferred || targets.length === 0) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target); // reveal once, no replay on scroll back up
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  targets.forEach((el) => observer.observe(el));
+})();

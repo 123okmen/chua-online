@@ -9,10 +9,10 @@
   <meta name="description" content="Chùa Online 4.0 - Không gian tu tập thanh tịnh tại gia. Gõ mõ tích đức, thắp nhang cầu an, thỉnh chuông bát nhã, xin xăm Quán Âm, thả cá phóng sinh online.">
   <meta name="theme-color" content="#0d0f17">
   
-  <!-- Google Fonts: Outfit & Plus Jakarta Sans & Playfair Display cho nét tâm linh truyền thống sang trọng -->
+  <!-- Google Fonts: Manrope (Vietnamese subset) - duy nhất 1 typeface -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&subset=vietnamese&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
 </head>
@@ -113,7 +113,7 @@
       <!-- ============================================================== -->
       <!-- TAB 0: CHÁNH ĐIỆN 3D & ĐẠO TRÀNG TÂM GIAO (3D TEMPLE & LIVE CHAT) -->
       <!-- ============================================================== -->
-      <section id="tab-temple3d" class="tab-panel active">
+      <section id="tab-temple3d" class="tab-panel reveal active">
         <div class="temple3d-layout-container">
           <div class="panel-header-badge">
             <h2>🛕 Chánh Điện 3D & Đạo Tràng Tâm Giao</h2>
@@ -222,7 +222,7 @@
       <!-- ============================================================== -->
       <!-- TAB 1: GÕ MÕ TỤNG KINH (VIRTUAL MUYU - GÕ MÕ TÍCH ĐỨC) -->
       <!-- ============================================================== -->
-      <section id="tab-moyu" class="tab-panel">
+      <section id="tab-moyu" class="tab-panel reveal">
         <div class="moyu-container">
           <!-- Hào quang Phật pháp -->
           <div class="buddha-aura" id="buddhaAura"></div>
@@ -344,7 +344,7 @@
       <!-- ============================================================== -->
       <!-- TAB 2: THẮP NHANG / DÂNG HƯƠNG QUÁN ÂM (VIRTUAL INCENSE) -->
       <!-- ============================================================== -->
-      <section id="tab-incense" class="tab-panel">
+      <section id="tab-incense" class="tab-panel reveal">
         <div class="incense-container">
           <div class="panel-header-badge">
             <h2>🕯️ Dâng Hương & Khấn Nguyện Tại Gia</h2>
@@ -428,7 +428,7 @@
       <!-- ============================================================== -->
       <!-- TAB 3: THỈNH ĐẠI HỒNG CHUNG (TEMPLE BELL / CHUÔNG BÁT NHÃ) -->
       <!-- ============================================================== -->
-      <section id="tab-bell" class="tab-panel">
+      <section id="tab-bell" class="tab-panel reveal">
         <div class="bell-container">
           <div class="panel-header-badge">
             <h2>🔔 Thỉnh Đại Hồng Chung Bát Nhã</h2>
@@ -482,7 +482,7 @@
       <!-- ============================================================== -->
       <!-- TAB 4: XIN XĂM / BỐC QUẺ QUÁN ÂM (FORTUNE DIVINATION STICKS) -->
       <!-- ============================================================== -->
-      <section id="tab-divination" class="tab-panel">
+      <section id="tab-divination" class="tab-panel reveal">
         <div class="divination-container">
           <div class="panel-header-badge">
             <h2>📜 Xin Xăm & Bốc Quẻ Linh Ứng Đầu Ngày</h2>
@@ -580,7 +580,7 @@
       <!-- ============================================================== -->
       <!-- TAB 5: HỒ SEN PHÓNG SINH (VIRTUAL LOTUS POND & FISH RELEASING) -->
       <!-- ============================================================== -->
-      <section id="tab-pond" class="tab-panel">
+      <section id="tab-pond" class="tab-panel reveal">
         <div class="pond-container">
           <div class="panel-header-badge">
             <h2>🐟 Hồ Sen Phóng Sinh Tích Phước</h2>
@@ -615,7 +615,7 @@
       <!-- ============================================================== -->
       <!-- TAB 6: DÂNG LỄ CÚNG DƯỜNG (VIRTUAL OFFERINGS) -->
       <!-- ============================================================== -->
-      <section id="tab-offering" class="tab-panel">
+      <section id="tab-offering" class="tab-panel reveal">
         <div class="offering-container">
           <div class="panel-header-badge">
             <h2>🌸 Dâng Lễ Cúng Dường Tam Bảo</h2>
@@ -681,7 +681,7 @@
       <!-- ============================================================== -->
       <!-- TAB 7: SỔ CÔNG ĐỨC & CẤP BẬC (MERIT LEDGER & LEVELS) -->
       <!-- ============================================================== -->
-      <section id="tab-ledger" class="tab-panel">
+      <section id="tab-ledger" class="tab-panel reveal">
         <div class="ledger-container">
           <div class="panel-header-badge">
             <h2>📒 Sổ Tích Lũy Công Đức & Tu Tập</h2>
@@ -772,7 +772,7 @@
       <!-- ============================================================== -->
       <!-- TAB 8: CÀI ĐẶT HỆ THỐNG TRỰC TIẾP (SYSTEM SETTINGS) -->
       <!-- ============================================================== -->
-      <section id="tab-settings" class="tab-panel">
+      <section id="tab-settings" class="tab-panel reveal">
         <div class="settings-page-container">
           <div class="panel-header-badge">
             <h2>⚙️ Cài Đặt Hệ Thống & Tùy Chỉnh</h2>
@@ -999,5 +999,9 @@
     </div>
   </div>
 
+<script>
+/* fail-safe: khong de noi dung bi an neu scroll-reveal khong kich hoat */
+setTimeout(function(){document.querySelectorAll('.reveal,[class*="reveal"]').forEach(function(el){el.classList.add('visible','is-visible','in-view','revealed');});},1800);
+</script>
 </body>
 </html>
